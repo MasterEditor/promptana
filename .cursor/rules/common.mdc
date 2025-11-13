@@ -1,0 +1,78 @@
+---
+alwaysApply: true
+---
+
+
+Project Cursor Rules — Promptana
+
+Overview
+-------
+- Project: Next.js (App Router) + TypeScript
+- Primary directories: `src/app/`, `public/`, `.ai/`
+- Build & dev: `npm run dev` (uses `next dev`)
+- Lint: `npm run lint`
+- Format: `npm run format`
+
+Goal
+----
+Provide explicit, repo-specific rules for the Cursor assistant so edits are safe, consistent, and fast to review.
+
+General editing rules
+---------------------
+- Always preserve the project's TypeScript `strict` settings; prefer type-safe, explicit typings.
+- Follow existing code style: use the existing indentation and formatting. Run `npm run format` if you modify multiple files.
+- Do not change package versions or core tooling (Next, React, TypeScript, Tailwind) unless the user asks explicitly.
+- Avoid large refactors in one PR. Break work into small, reviewable commits.
+- Prefer small, focused changes that include tests or lint fixes when applicable.
+
+Project-specific notes
+----------------------
+- App directory: This project uses Next.js App Router. Add pages/components under `src/app/`. Server components may be used by default — mark components `use client` only when client behavior is required.
+- Path aliases: The tsconfig defines `@/* -> ./src/*`. Use that alias for internal imports.
+- Styling: PostCSS/Tailwind are configured. Use Tailwind utility classes where appropriate; keep global styles in `src/app/globals.css`.
+- Database & backend: The stack mentions Supabase Auth, Postgres, and Prisma; backend logic lives in Next.js API routes unless otherwise specified. Keep secrets out of the repo and use environment variables.
+- Lint and format: Run `npm run lint` and `npm run format` before pushing. Fix lint errors rather than suppressing them.
+- Scripts: Use existing package.json scripts for dev/build/start. For local testing use `npm run dev`.
+
+Commit and PR guidance
+----------------------
+- Commit messages: short imperative summary, e.g. `fix(auth): validate session in middleware`.
+- PRs: Describe the change, provide how to test locally (commands and steps), and list any related issue/PR IDs.
+- If a change alters shared runtime behavior (routing, middleware, API surface), include a short migration note in the PR description.
+
+Assistant behavior rules
+------------------------
+- When adding or editing code:
+  - Run lint and format locally (or remind reviewer to do so).
+  - Keep changes small and add tests if the change affects logic.
+  - Preserve existing import ordering and code structure.
+  - Prefer explicit return types on exported functions/components.
+  - When adding new dependencies, require explicit user approval.
+
+- When unsure about intention:
+  - Ask one concise clarifying question before making non-trivial changes.
+
+- When searching the repo:
+  - Focus on `src/app`, `package.json`, `tsconfig.json`, and `.ai/` for project-specific guidance.
+
+Files to avoid editing unnecessarily
+----------------------------------
+- `public/` (static assets) except when adding new static assets.
+- `.gitignore`, CI config (not present by default), and project config files unless the change is requested.
+
+How to run and test locally
+--------------------------
+1. Install: `npm install`
+2. Dev server: `npm run dev`
+3. Lint: `npm run lint`
+4. Format: `npm run format`
+
+If you add server-side code that requires env vars (database, Supabase), include a short note in the PR telling reviewers which `.env` variables are required and example values (do not commit secrets).
+
+If you modify TypeScript configuration or path aliases, update `tsconfig.json` and ensure imports still resolve.
+
+Contact / escalation
+--------------------
+If a change risks data loss, downtime, or major UX regressions, stop and ask the user before proceeding.
+
+
