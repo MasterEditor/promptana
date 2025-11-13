@@ -5,7 +5,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="58b05fbb-79c4-4850-936b-9d957f9cc784" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.cursor/mcp.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/components/ui/button.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/components/ui/index.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/components/ui/utils.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.ai/tech-stack.md" beforeDir="false" afterPath="$PROJECT_DIR$/.ai/tech-stack.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
     </list>
@@ -79,7 +83,7 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1763039732839</updated>
-      <workItem from="1763039734359" duration="6028000" />
+      <workItem from="1763039734359" duration="6650000" />
     </task>
     <servers />
   </component>
