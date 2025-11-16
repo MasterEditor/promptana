@@ -9,7 +9,7 @@ Key principles:
 - Server-side OpenRouter integration (server-held key).
 - Single-user MVP (no collaboration or public APIs).
 - Emphasis on prompt discovery (tags, catalogs, full-text search), execution, versioning, and an "Improve" workflow.
-- Cost and quota constraints to control OpenRouter usage.
+- Quota constraints to control OpenRouter usage.
 
 ## 2. User Problem
 
