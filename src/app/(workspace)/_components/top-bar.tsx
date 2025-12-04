@@ -108,6 +108,32 @@ export function TopBar() {
           >
             Settings
           </Button>
+          <Button
+            type="button"
+            variant="ghost"
+            className="h-8 px-3 text-xs"
+            onClick={async () => {
+              try {
+                const response = await fetch("/api/auth/signout", {
+                  method: "POST",
+                  credentials: "include",
+                })
+
+                if (!response.ok && response.status !== 401) {
+                  // eslint-disable-next-line no-console
+                  console.error("[TopBar] Sign-out failed", response.status)
+                  return
+                }
+
+                window.location.href = "/"
+              } catch (error) {
+                // eslint-disable-next-line no-console
+                console.error("[TopBar] Sign-out failed", error)
+              }
+            }}
+          >
+            Sign out
+          </Button>
         </div>
       </div>
     </header>

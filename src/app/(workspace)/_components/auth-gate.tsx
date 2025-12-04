@@ -9,7 +9,7 @@ import { SignInRequiredPanel } from "./sign-in-required-panel"
 function AuthGateInner({ children }: { children: ReactNode }) {
   const { status, error, refresh } = useAuth()
 
-  if (status === "unknown") {
+  if (status === "checking") {
     return (
       <main className="flex min-h-screen items-center justify-center bg-background">
         <p className="text-sm text-muted-foreground">Checking your session…</p>

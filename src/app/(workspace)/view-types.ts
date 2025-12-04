@@ -25,7 +25,11 @@ export interface CatalogNavItemVm {
   isActive: boolean
 }
 
-export type AuthStatus = "unknown" | "authenticated" | "unauthenticated" | "error"
+export type AuthStatus =
+  | "checking"
+  | "authenticated"
+  | "unauthenticated"
+  | "error"
 
 export interface AuthStateVm {
   status: AuthStatus

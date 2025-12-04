@@ -10,7 +10,11 @@ import {
 
 import type { CurrentUserDto, ErrorResponseDto } from "@/types"
 
-export type AuthStatus = "unknown" | "authenticated" | "unauthenticated" | "error"
+export type AuthStatus =
+  | "checking"
+  | "authenticated"
+  | "unauthenticated"
+  | "error"
 
 export interface AuthState {
   status: AuthStatus
@@ -100,7 +104,7 @@ async function fetchCurrentUser(): Promise<{
 
 export function useAuth(): AuthState & { refresh: () => Promise<void> } {
   const [state, setState] = useState<AuthState>({
-    status: "unknown",
+    status: "checking",
     user: null,
     error: null,
   })
