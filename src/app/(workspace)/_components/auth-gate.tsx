@@ -46,7 +46,7 @@ function AuthGateInner({ children }: { children: ReactNode }) {
     )
   }
 
-  // Authenticated – render children for now. AppShell layout will be added in a later step.
+  // Authenticated – render children inside the workspace AppShell layout.
   return <AppShell>{children}</AppShell>
 }
 

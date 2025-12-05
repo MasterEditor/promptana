@@ -7,11 +7,13 @@ import { Button } from "@/components/ui/button"
 import { useAuthContext } from "../_auth/auth-context"
 import { useOfflineContext } from "../_contexts/offline-context"
 import { useQuotaContext } from "../_contexts/quota-context"
+import { useGlobalMessagesContext } from "../_contexts/global-messages-context"
 
 export function TopBar() {
   const { user } = useAuthContext()
   const { summary } = useQuotaContext()
   const { isOffline } = useOfflineContext()
+  const { addMessage } = useGlobalMessagesContext()
 
   const router = useRouter()
   const pathname = usePathname()
@@ -120,15 +122,22 @@ export function TopBar() {
                 })
 
                 if (!response.ok && response.status !== 401) {
-                  // eslint-disable-next-line no-console
-                  console.error("[TopBar] Sign-out failed", response.status)
+                  addMessage({
+                    type: "error",
+                    title: "Sign-out failed",
+                    message: "We couldn’t sign you out. Please try again.",
+                  })
                   return
                 }
 
                 window.location.href = "/"
               } catch (error) {
-                // eslint-disable-next-line no-console
-                console.error("[TopBar] Sign-out failed", error)
+                addMessage({
+                  type: "error",
+                  title: "Sign-out failed",
+                  message:
+                    "We couldn’t sign you out due to a network error. Please try again.",
+                })
               }
             }}
           >

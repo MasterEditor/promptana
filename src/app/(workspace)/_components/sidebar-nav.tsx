@@ -42,7 +42,10 @@ export function SidebarNav({ selectedSection }: SidebarNavProps) {
 
   return (
     <aside className="hidden h-screen w-64 flex-col border-r border-zinc-200 bg-zinc-50 px-4 py-6 dark:border-zinc-800 dark:bg-zinc-950 md:flex">
-      <nav className="space-y-6 text-sm">
+      <nav
+        className="space-y-6 text-sm"
+        aria-label="Primary workspace navigation"
+      >
         <div className="space-y-1">
           {navItems.map((item) => (
             <button
@@ -62,7 +65,7 @@ export function SidebarNav({ selectedSection }: SidebarNavProps) {
           ))}
         </div>
 
-        <div className="space-y-2">
+        <div className="space-y-2" aria-label="Catalog navigation">
           <button
             type="button"
             className="flex w-full items-center justify-between rounded-md px-2 py-1.5 text-left text-xs font-semibold uppercase tracking-wide text-zinc-500 hover:bg-zinc-200 dark:text-zinc-400 dark:hover:bg-zinc-800"
