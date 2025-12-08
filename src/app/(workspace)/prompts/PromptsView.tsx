@@ -3,6 +3,13 @@
 import { useMemo, useState } from "react"
 
 import { Button } from "@/components/ui/button"
+import { Checkbox } from "@/components/ui/checkbox"
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover"
+import type { TagId } from "@/types"
 
 import {
   getInitialDensity,
@@ -186,23 +193,11 @@ function PromptFiltersBar({
             }
           />
 
-          <select
-            multiple
-            className="h-9 min-w-[8rem] rounded-md border border-zinc-300 bg-white px-2 py-1 text-xs text-zinc-900 shadow-sm outline-none focus:border-zinc-500 focus:ring-1 focus:ring-zinc-500 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-50 md:w-52"
-            value={filters.tagIds as string[]}
-            onChange={(event) => {
-              const tagIds = Array.from(event.target.selectedOptions).map(
-                (option) => option.value,
-              )
-              onFiltersChange({ tagIds })
-            }}
-          >
-            {options.availableTags.map((tag) => (
-              <option key={tag.id} value={tag.id as string}>
-                {tag.name}
-              </option>
-            ))}
-          </select>
+          <TagMultiSelect
+            selectedTagIds={filters.tagIds as TagId[]}
+            availableTags={options.availableTags}
+            onSelectionChange={(tagIds) => onFiltersChange({ tagIds })}
+          />
 
           <select
             className="h-9 min-w-[8rem] rounded-md border border-zinc-300 bg-white px-2 py-1 text-xs text-zinc-900 shadow-sm outline-none focus:border-zinc-500 focus:ring-1 focus:ring-zinc-500 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-50 md:w-40"
@@ -288,6 +283,112 @@ function PromptFiltersBar({
         </div>
       ) : null}
     </div>
+  )
+}
+
+// ---------------------------------------------------------------------------
+// TagMultiSelect
+// ---------------------------------------------------------------------------
+
+interface TagMultiSelectProps {
+  selectedTagIds: TagId[]
+  availableTags: { id: string; name: string }[]
+  onSelectionChange: (tagIds: TagId[]) => void
+}
+
+function TagMultiSelect({
+  selectedTagIds,
+  availableTags,
+  onSelectionChange,
+}: TagMultiSelectProps) {
+  const [open, setOpen] = useState(false)
+
+  const selectedCount = selectedTagIds.length
+
+  const handleToggleTag = (tagId: TagId, checked: boolean) => {
+    if (checked) {
+      onSelectionChange([...selectedTagIds, tagId])
+    } else {
+      onSelectionChange(selectedTagIds.filter((id) => id !== tagId))
+    }
+  }
+
+  const handleClearAll = () => {
+    onSelectionChange([])
+  }
+
+  return (
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
+        <button
+          type="button"
+          className="flex h-9 min-w-[8rem] items-center justify-between gap-2 rounded-md border border-zinc-300 bg-white px-2 py-1 text-xs text-zinc-900 shadow-sm outline-none hover:bg-zinc-50 focus:border-zinc-500 focus:ring-1 focus:ring-zinc-500 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-50 dark:hover:bg-zinc-800 md:w-40"
+          aria-label="Filter by tags"
+        >
+          <span className="truncate">
+            {selectedCount === 0
+              ? "All tags"
+              : selectedCount === 1
+                ? "1 tag"
+                : `${selectedCount} tags`}
+          </span>
+          <svg
+            className="h-4 w-4 shrink-0 text-zinc-500"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            strokeWidth={2}
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="m19.5 8.25-7.5 7.5-7.5-7.5"
+            />
+          </svg>
+        </button>
+      </PopoverTrigger>
+      <PopoverContent className="w-56 p-0" align="start">
+        <div className="max-h-64 overflow-y-auto p-2">
+          {availableTags.length === 0 ? (
+            <p className="px-2 py-1.5 text-xs text-zinc-500 dark:text-zinc-400">
+              No tags available
+            </p>
+          ) : (
+            <div className="space-y-1">
+              {availableTags.map((tag) => {
+                const isSelected = selectedTagIds.includes(tag.id as TagId)
+                return (
+                  <label
+                    key={tag.id}
+                    className="flex cursor-pointer items-center gap-2 rounded-md px-2 py-1.5 text-sm hover:bg-zinc-100 dark:hover:bg-zinc-800"
+                  >
+                    <Checkbox
+                      checked={isSelected}
+                      onCheckedChange={(checked) =>
+                        handleToggleTag(tag.id as TagId, checked === true)
+                      }
+                    />
+                    <span className="truncate">{tag.name}</span>
+                  </label>
+                )
+              })}
+            </div>
+          )}
+        </div>
+        {selectedCount > 0 ? (
+          <div className="border-t border-zinc-200 p-2 dark:border-zinc-700">
+            <button
+              type="button"
+              onClick={handleClearAll}
+              className="w-full rounded-md px-2 py-1.5 text-xs text-zinc-600 hover:bg-zinc-100 dark:text-zinc-400 dark:hover:bg-zinc-800"
+            >
+              Clear selection
+            </button>
+          </div>
+        ) : null}
+      </PopoverContent>
+    </Popover>
   )
 }
 

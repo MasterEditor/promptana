@@ -11,7 +11,6 @@ const mainSections: { id: NavSectionId; label: string; href: string }[] = [
   { id: "catalogs", label: "Catalogs", href: "/catalogs" },
   { id: "tags", label: "Tags", href: "/tags" },
   { id: "search", label: "Search", href: "/search" },
-  { id: "settings", label: "Settings", href: "/settings" },
 ]
 
 interface SidebarNavProps {

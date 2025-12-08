@@ -7,7 +7,6 @@ import type { NavSectionId } from "../view-types"
 const mobileSections: { id: NavSectionId; label: string; href: string }[] = [
   { id: "prompts", label: "Prompts", href: "/prompts" },
   { id: "search", label: "Search", href: "/search" },
-  { id: "settings", label: "Settings", href: "/settings" },
 ]
 
 export function MobileNav() {

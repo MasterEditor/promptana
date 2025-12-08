@@ -1,30 +1,15 @@
 import type { SupabaseClient } from "@supabase/supabase-js"
 
 import type { Database } from "@/db/database.types"
-import type {
-  CurrentUserDto,
-  CurrentUserSettingsDto,
-  UserId,
-  UserSettingsDto,
-} from "@/types"
+import type { CurrentUserDto, UserId } from "@/types"
 import { ApiError } from "@/server/http-errors"
-import * as userSettingsService from "@/server/user-settings-service"
 
 type TypedSupabaseClient = SupabaseClient<Database>
 
-function buildCurrentUserSettingsDto(
-  settings: UserSettingsDto,
-): CurrentUserSettingsDto {
-  return {
-    retentionPolicy: settings.retentionPolicy,
-  }
-}
-
 /**
- * Compose the authenticated user's profile and derived application settings.
+ * Compose the authenticated user's profile.
  *
- * This helper is used by GET /api/me to keep the route handler thin and to
- * centralize any future changes to how settings are derived.
+ * This helper is used by GET /api/me to keep the route handler thin.
  */
 export async function getCurrentUser(
   client: TypedSupabaseClient,
@@ -63,14 +48,10 @@ export async function getCurrentUser(
     })
   }
 
-  const settings = await userSettingsService.getOrCreateForUser(client, userId)
-  const settingsDto = buildCurrentUserSettingsDto(settings)
-
   const dto: CurrentUserDto = {
     id: user.id as UserId,
     email: user.email ?? "",
     createdAt: user.created_at,
-    settings: settingsDto,
   }
 
   return dto

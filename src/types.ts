@@ -17,7 +17,6 @@ export type PromptVersionEntity = Tables<"prompt_versions">
 export type RunEntity = Tables<"runs">
 export type RunEventEntity = Tables<"run_events">
 export type PromptTagEntity = Tables<"prompt_tags">
-export type UserSettingsEntity = Tables<"user_settings">
 
 type CatalogInsert = TablesInsert<"catalogs">
 type CatalogUpdate = TablesUpdate<"catalogs">
@@ -27,13 +26,11 @@ type PromptInsert = TablesInsert<"prompts">
 type PromptUpdate = TablesUpdate<"prompts">
 type PromptVersionInsert = TablesInsert<"prompt_versions">
 type RunInsert = TablesInsert<"runs">
-type UserSettingsInsert = TablesInsert<"user_settings">
-type UserSettingsUpdate = TablesUpdate<"user_settings">
 
 /**
  * Common scalar aliases to keep ID/timestamp types in sync with DB.
  */
-export type UserId = UserSettingsEntity["user_id"]
+export type UserId = PromptEntity["user_id"]
 export type PromptId = PromptEntity["id"]
 export type PromptVersionId = PromptVersionEntity["id"]
 export type RunId = RunEntity["id"]
@@ -44,7 +41,6 @@ export type IsoTimestampString = PromptEntity["created_at"]
 export type JsonValue = Json
 
 export type RunStatus = Enums<"run_status">
-export type RetentionPolicy = Enums<"retention_policy">
 
 /**
  * Run event types are constrained at the API layer even though the DB
@@ -101,29 +97,10 @@ export interface ErrorResponseDto {
 /**
  * /api/me – authenticated user representation.
  */
-export interface CurrentUserSettingsDto {
-  retentionPolicy: RetentionPolicy
-}
-
 export interface CurrentUserDto {
   id: UserId
   email: string
   createdAt: IsoTimestampString
-  settings: CurrentUserSettingsDto
-}
-
-/**
- * /api/settings – user settings DTO and command models.
- */
-export interface UserSettingsDto {
-  userId: UserSettingsEntity["user_id"]
-  retentionPolicy: RetentionPolicy
-  createdAt: UserSettingsEntity["created_at"]
-  updatedAt: UserSettingsEntity["updated_at"]
-}
-
-export interface UpdateUserSettingsCommand {
-  retentionPolicy: RetentionPolicy
 }
 
 /**

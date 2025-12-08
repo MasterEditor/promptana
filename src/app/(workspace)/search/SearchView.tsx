@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useState } from "react"
+import { useCallback, useEffect, useRef, useState } from "react"
 import { useRouter } from "next/navigation"
 
 import { Button } from "@/components/ui/button"
@@ -37,17 +37,33 @@ export default function SearchView({ initialFilters }: SearchViewProps) {
   const [queryInput, setQueryInput] = useState(filters.q)
   const debouncedQuery = useDebouncedValue(queryInput, 300)
 
+  // Track if user is typing (to prevent overwriting input from URL sync)
+  const isTypingRef = useRef(false)
+
+  // Sync query input when filters.q changes externally (e.g. URL change)
+  useEffect(() => {
+    if (!isTypingRef.current) {
+      setQueryInput(filters.q)
+    }
+  }, [filters.q])
+
   // Update filters when debounced query changes
   // Using a callback to check if it actually changed
   const handleQueryChange = useCallback(
     (value: string) => {
+      isTypingRef.current = true
       setQueryInput(value)
+      // Reset typing flag after debounce period
+      setTimeout(() => {
+        isTypingRef.current = false
+      }, 350)
     },
     [],
   )
 
   // Submit search immediately (on Enter)
   const handleSubmitSearch = useCallback(() => {
+    isTypingRef.current = false
     if (queryInput.trim() !== filters.q) {
       updateFilters({ q: queryInput.trim() })
     }

@@ -1,7 +1,7 @@
 'use client'
 
 import { useCallback, useEffect, useMemo, useState } from "react"
-import { useRouter } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
 
 import type {
   CatalogId,
@@ -107,9 +107,59 @@ function parseErrorResponse(error: unknown): ErrorResponseDto {
   }
 }
 
+/**
+ * Parse filters from URL search params for prompts list
+ */
+function parsePromptFiltersFromSearchParams(
+  searchParams: URLSearchParams,
+  defaults: { pageSize: number },
+): PromptListFiltersVm {
+  const search = searchParams.get("search") ?? ""
+  const tagIdsRaw = searchParams.get("tagIds") ?? ""
+  const tagIds = tagIdsRaw
+    .split(",")
+    .map((s) => s.trim())
+    .filter((s) => s.length > 0) as TagId[]
+  const catalogIdRaw = searchParams.get("catalogId")
+  const catalogId = catalogIdRaw && catalogIdRaw.trim().length > 0
+    ? (catalogIdRaw.trim() as CatalogId)
+    : null
+  const sortRaw = searchParams.get("sort")
+  const allowedSorts: PromptListSort[] = [
+    "updatedAtDesc",
+    "createdAtDesc",
+    "titleAsc",
+    "lastRunDesc",
+    "relevance",
+  ]
+  const sort = allowedSorts.includes(sortRaw as PromptListSort)
+    ? (sortRaw as PromptListSort)
+    : "updatedAtDesc"
+  const pageRaw = parseInt(searchParams.get("page") ?? "1", 10)
+  const page = Number.isNaN(pageRaw) || pageRaw < 1 ? 1 : pageRaw
+  const pageSizeRaw = parseInt(
+    searchParams.get("pageSize") ?? String(defaults.pageSize),
+    10,
+  )
+  const pageSize = Number.isNaN(pageSizeRaw) || pageSizeRaw < 1 || pageSizeRaw > 100
+    ? defaults.pageSize
+    : pageSizeRaw
+
+  return { search, tagIds, catalogId, sort, page, pageSize }
+}
+
 export function usePromptListFilters(initialFilters: PromptListFiltersVm) {
   const router = useRouter()
+  const searchParams = useSearchParams()
   const [filters, setFilters] = useState<PromptListFiltersVm>(initialFilters)
+
+  // Sync filters from URL when searchParams change externally
+  useEffect(() => {
+    const parsed = parsePromptFiltersFromSearchParams(searchParams, {
+      pageSize: initialFilters.pageSize,
+    })
+    setFilters(parsed)
+  }, [searchParams, initialFilters.pageSize])
 
   const updateFilters = useCallback(
     (partial: Partial<PromptListFiltersVm>) => {
@@ -130,7 +180,7 @@ export function usePromptListFilters(initialFilters: PromptListFiltersVm) {
         }
 
         const query = buildQueryFromFilters(next)
-        const href = query.length > 0 ? `?${query}` : "?"
+        const href = query.length > 0 ? `/prompts?${query}` : "/prompts"
 
         router.replace(href, { scroll: false })
 
@@ -152,7 +202,7 @@ export function usePromptListFilters(initialFilters: PromptListFiltersVm) {
       }
 
       const query = buildQueryFromFilters(next)
-      const href = query.length > 0 ? `?${query}` : "?"
+      const href = query.length > 0 ? `/prompts?${query}` : "/prompts"
 
       router.replace(href, { scroll: false })
 

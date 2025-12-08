@@ -1,10 +1,16 @@
 'use client'
 
-import { useMemo } from "react"
+import { useMemo, useState } from "react"
 
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Checkbox } from "@/components/ui/checkbox"
 import { Input } from "@/components/ui/input"
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover"
 import { Textarea } from "@/components/ui/textarea"
 
 import type { CatalogId, PromptId, TagId } from "@/types"
@@ -13,6 +19,7 @@ import {
   useImprovePrompt,
   useOfflineStatus,
   usePromptDetailOverview,
+  usePromptFiltersOptions,
   useRunPrompt,
 } from "./hooks"
 import {
@@ -41,6 +48,14 @@ export function PromptDetailOverviewView({
   } = usePromptDetailOverview(promptId)
 
   const isOffline = useOfflineStatus()
+
+  // Load catalog and tag options for selectors
+  const {
+    options,
+    isLoading: isOptionsLoading,
+    error: optionsError,
+    refresh: refreshOptions,
+  } = usePromptFiltersOptions()
 
   const { isRunning, error: runError, runPrompt } = useRunPrompt(
     promptId,
@@ -165,22 +180,28 @@ export function PromptDetailOverviewView({
             ) : null}
           </div>
 
-          {/* Catalog and tags are wired but use simple controls for now.
-              They will be refined in later steps to match the full plan. */}
-          <div className="flex flex-col gap-2 md:flex-row md:gap-4">
+          <div className="flex flex-col gap-4 md:flex-row md:gap-4">
             <div className="flex-1 space-y-2">
               <label className="block text-xs font-medium text-zinc-700 dark:text-zinc-200">
                 Catalog
               </label>
-              <Input
+              <select
                 value={editor.draftCatalogId ?? ""}
                 onChange={(event) =>
                   setDraftCatalog(
-                    (event.target.value || null) as CatalogId | null,
+                    event.target.value === "" ? null : (event.target.value as CatalogId),
                   )
                 }
-                placeholder="Catalog ID (temporary input)"
-              />
+                disabled={isOptionsLoading}
+                className="flex h-9 w-full rounded-md border border-zinc-300 bg-white px-3 py-1 text-sm text-zinc-900 shadow-sm outline-none ring-offset-white focus:border-zinc-500 focus:ring-1 focus:ring-zinc-500 disabled:cursor-not-allowed disabled:opacity-50 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-50 dark:ring-offset-zinc-950 dark:focus:border-zinc-500 dark:focus:ring-zinc-500"
+              >
+                <option value="">No catalog</option>
+                {options.availableCatalogs.map((catalog) => (
+                  <option key={catalog.id} value={catalog.id}>
+                    {catalog.name}
+                  </option>
+                ))}
+              </select>
               {editor.fieldErrors.catalogId ? (
                 <p className="text-xs text-red-600 dark:text-red-400">
                   {editor.fieldErrors.catalogId[0]}
@@ -190,19 +211,13 @@ export function PromptDetailOverviewView({
 
             <div className="flex-1 space-y-2">
               <label className="block text-xs font-medium text-zinc-700 dark:text-zinc-200">
-                Tag IDs
+                Tags
               </label>
-              <Input
-                value={editor.draftTagIds.join(",")}
-                onChange={(event) =>
-                  setDraftTags(
-                    event.target.value
-                      .split(",")
-                      .map((value) => value.trim())
-                      .filter(Boolean) as TagId[],
-                  )
-                }
-                placeholder="Comma-separated tag IDs (temporary input)"
+              <PromptDetailTagSelector
+                selectedTagIds={editor.draftTagIds as TagId[]}
+                availableTags={options.availableTags}
+                onSelectionChange={(tagIds) => setDraftTags(tagIds)}
+                isLoading={isOptionsLoading}
               />
               {editor.fieldErrors.tagIds ? (
                 <p className="text-xs text-red-600 dark:text-red-400">
@@ -211,6 +226,21 @@ export function PromptDetailOverviewView({
               ) : null}
             </div>
           </div>
+
+          {optionsError ? (
+            <div className="flex items-center gap-2 text-xs text-amber-700 dark:text-amber-300">
+              <span>Failed to load catalog/tag options.</span>
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                className="h-6 px-2 text-[11px]"
+                onClick={refreshOptions}
+              >
+                Retry
+              </Button>
+            </div>
+          ) : null}
 
           <PromptContentEditor
             editor={editor}
@@ -499,6 +529,123 @@ function PromptResultPanel({ prompt }: PromptResultPanelProps) {
         )}
       </CardContent>
     </Card>
+  )
+}
+
+// ---------------------------------------------------------------------------
+// PromptDetailTagSelector
+// ---------------------------------------------------------------------------
+
+interface PromptDetailTagSelectorProps {
+  selectedTagIds: TagId[]
+  availableTags: { id: string; name: string }[]
+  onSelectionChange: (tagIds: TagId[]) => void
+  isLoading?: boolean
+}
+
+function PromptDetailTagSelector({
+  selectedTagIds,
+  availableTags,
+  onSelectionChange,
+  isLoading,
+}: PromptDetailTagSelectorProps) {
+  const [open, setOpen] = useState(false)
+
+  const selectedCount = selectedTagIds.length
+  const selectedNames = availableTags
+    .filter((tag) => selectedTagIds.includes(tag.id as TagId))
+    .map((tag) => tag.name)
+
+  const handleToggleTag = (tagId: TagId, checked: boolean) => {
+    if (checked) {
+      onSelectionChange([...selectedTagIds, tagId])
+    } else {
+      onSelectionChange(selectedTagIds.filter((id) => id !== tagId))
+    }
+  }
+
+  const handleClearAll = () => {
+    onSelectionChange([])
+  }
+
+  if (isLoading) {
+    return (
+      <div className="flex h-9 items-center rounded-md border border-zinc-300 bg-zinc-50 px-3 text-sm text-zinc-500 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-400">
+        Loading tags...
+      </div>
+    )
+  }
+
+  return (
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
+        <button
+          type="button"
+          className="flex h-9 w-full items-center justify-between gap-2 rounded-md border border-zinc-300 bg-white px-3 py-1 text-sm text-zinc-900 shadow-sm outline-none hover:bg-zinc-50 focus:border-zinc-500 focus:ring-1 focus:ring-zinc-500 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-50 dark:hover:bg-zinc-800"
+          aria-label="Select tags"
+        >
+          <span className="truncate text-left">
+            {selectedCount === 0
+              ? "No tags selected"
+              : selectedNames.join(", ")}
+          </span>
+          <svg
+            className="h-4 w-4 shrink-0 text-zinc-500"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            strokeWidth={2}
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="m19.5 8.25-7.5 7.5-7.5-7.5"
+            />
+          </svg>
+        </button>
+      </PopoverTrigger>
+      <PopoverContent className="w-64 p-0" align="start">
+        <div className="max-h-64 overflow-y-auto p-2">
+          {availableTags.length === 0 ? (
+            <p className="px-2 py-1.5 text-xs text-zinc-500 dark:text-zinc-400">
+              No tags available
+            </p>
+          ) : (
+            <div className="space-y-1">
+              {availableTags.map((tag) => {
+                const isSelected = selectedTagIds.includes(tag.id as TagId)
+                return (
+                  <label
+                    key={tag.id}
+                    className="flex cursor-pointer items-center gap-2 rounded-md px-2 py-1.5 text-sm hover:bg-zinc-100 dark:hover:bg-zinc-800"
+                  >
+                    <Checkbox
+                      checked={isSelected}
+                      onCheckedChange={(checked) =>
+                        handleToggleTag(tag.id as TagId, checked === true)
+                      }
+                    />
+                    <span className="truncate">{tag.name}</span>
+                  </label>
+                )
+              })}
+            </div>
+          )}
+        </div>
+        {selectedCount > 0 ? (
+          <div className="border-t border-zinc-200 p-2 dark:border-zinc-700">
+            <button
+              type="button"
+              onClick={handleClearAll}
+              className="w-full rounded-md px-2 py-1.5 text-xs text-zinc-600 hover:bg-zinc-100 dark:text-zinc-400 dark:hover:bg-zinc-800"
+            >
+              Clear selection
+            </button>
+          </div>
+        ) : null}
+      </PopoverContent>
+    </Popover>
   )
 }
 

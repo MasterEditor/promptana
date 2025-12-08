@@ -7,7 +7,7 @@ import type {
   TagId,
 } from "@/types"
 
-export type NavSectionId = "prompts" | "catalogs" | "tags" | "search" | "settings"
+export type NavSectionId = "prompts" | "catalogs" | "tags" | "search"
 
 export interface NavItemVm {
   id: NavSectionId

@@ -1,12 +1,14 @@
 'use client'
 
 import { useCallback, useEffect, useMemo, useState } from "react"
-import { useRouter } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
 
 import type {
+  CatalogId,
   CatalogListResponseDto,
   ErrorResponseDto,
   SearchPromptsResponseDto,
+  TagId,
   TagListResponseDto,
 } from "@/types"
 
@@ -14,6 +16,7 @@ import type {
   SearchFiltersOptionsVm,
   SearchFiltersVm,
   SearchResultItemVm,
+  SearchSortOption,
   SearchViewState,
 } from "./view-types"
 import { mapSearchResultDtoToVm } from "./view-types"
@@ -99,13 +102,58 @@ function parseErrorResponse(error: unknown): ErrorResponseDto {
 }
 
 /**
+ * Parse filters from URL search params
+ */
+function parseFiltersFromSearchParams(
+  searchParams: URLSearchParams,
+  defaults: { pageSize: number },
+): SearchFiltersVm {
+  const q = searchParams.get("q") ?? ""
+  const tagIdsRaw = searchParams.get("tagIds") ?? ""
+  const tagIds = tagIdsRaw
+    .split(",")
+    .map((s) => s.trim())
+    .filter((s) => s.length > 0) as TagId[]
+  const catalogIdRaw = searchParams.get("catalogId")
+  const catalogId = catalogIdRaw && catalogIdRaw.trim().length > 0
+    ? (catalogIdRaw.trim() as CatalogId)
+    : null
+  const sortRaw = searchParams.get("sort")
+  const allowedSorts: SearchSortOption[] = ["relevance", "updatedAtDesc"]
+  const sort = allowedSorts.includes(sortRaw as SearchSortOption)
+    ? (sortRaw as SearchSortOption)
+    : "relevance"
+  const pageRaw = parseInt(searchParams.get("page") ?? "1", 10)
+  const page = Number.isNaN(pageRaw) || pageRaw < 1 ? 1 : pageRaw
+  const pageSizeRaw = parseInt(
+    searchParams.get("pageSize") ?? String(defaults.pageSize),
+    10,
+  )
+  const pageSize = Number.isNaN(pageSizeRaw) || pageSizeRaw < 1 || pageSizeRaw > 50
+    ? defaults.pageSize
+    : pageSizeRaw
+
+  return { q, tagIds, catalogId, sort, page, pageSize }
+}
+
+/**
  * Hook for managing search filter state with URL synchronization.
  * Updates URL search params when filters change.
  * Resets page to 1 when query, tags, catalog, or sort changes.
+ * Also syncs state when URL changes externally (e.g. from global search).
  */
 export function useSearchFilters(initialFilters: SearchFiltersVm) {
   const router = useRouter()
+  const searchParams = useSearchParams()
   const [filters, setFilters] = useState<SearchFiltersVm>(initialFilters)
+
+  // Sync filters from URL when searchParams change externally
+  useEffect(() => {
+    const parsed = parseFiltersFromSearchParams(searchParams, {
+      pageSize: initialFilters.pageSize,
+    })
+    setFilters(parsed)
+  }, [searchParams, initialFilters.pageSize])
 
   const updateFilters = useCallback(
     (partial: Partial<SearchFiltersVm>) => {

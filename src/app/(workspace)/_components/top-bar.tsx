@@ -96,14 +96,6 @@ export function TopBar() {
             type="button"
             variant="ghost"
             className="h-8 px-3 text-xs"
-            onClick={() => router.push("/settings")}
-          >
-            Settings
-          </Button>
-          <Button
-            type="button"
-            variant="ghost"
-            className="h-8 px-3 text-xs"
             onClick={async () => {
               try {
                 const response = await fetch("/api/auth/signout", {
