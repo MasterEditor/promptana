@@ -5,7 +5,6 @@ import type { ReactNode } from "react"
 import { useAuthContext } from "../_auth/auth-context"
 import { GlobalMessagesProvider } from "../_contexts/global-messages-context"
 import { OfflineProvider } from "../_contexts/offline-context"
-import { QuotaProvider } from "../_contexts/quota-context"
 import { GlobalBannerArea } from "./global-banner-area"
 import { MobileNav } from "./mobile-nav"
 import { SidebarNav } from "./sidebar-nav"
@@ -27,19 +26,17 @@ export function AppShell({ children }: AppShellProps) {
   return (
     <OfflineProvider>
       <GlobalMessagesProvider>
-        <QuotaProvider>
-          <div className="flex min-h-screen bg-zinc-50 text-zinc-900 dark:bg-black dark:text-zinc-50">
-            <SidebarNav />
-            <div className="flex min-h-screen flex-1 flex-col">
-              <TopBar />
-              <GlobalBannerArea />
-              <main className="flex-1 px-4 py-4 pb-16 md:px-8 md:pb-8">
-                {children}
-              </main>
-            </div>
-            <MobileNav />
+        <div className="flex min-h-screen bg-zinc-50 text-zinc-900 dark:bg-black dark:text-zinc-50">
+          <SidebarNav />
+          <div className="flex min-h-screen flex-1 flex-col">
+            <TopBar />
+            <GlobalBannerArea />
+            <main className="flex-1 px-4 py-4 pb-16 md:px-8 md:pb-8">
+              {children}
+            </main>
           </div>
-        </QuotaProvider>
+          <MobileNav />
+        </div>
       </GlobalMessagesProvider>
     </OfflineProvider>
   )

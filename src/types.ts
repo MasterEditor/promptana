@@ -103,8 +103,6 @@ export interface ErrorResponseDto {
  */
 export interface CurrentUserSettingsDto {
   retentionPolicy: RetentionPolicy
-  dailyRunQuota: number
-  dailyImproveQuota: number
 }
 
 export interface CurrentUserDto {
@@ -426,43 +424,6 @@ export interface SearchPromptResultItemDto {
 }
 
 export type SearchPromptsResponseDto = PaginatedDto<SearchPromptResultItemDto>
-
-/**
- * Quotas and usage DTOs.
- */
-export interface QuotaLimitsDto {
-  runPerDay: number
-  improvePerDay: number
-}
-
-export interface QuotaUsageCountsDto {
-  runCount: number
-  improveCount: number
-}
-
-export interface QuotaRemainingDto {
-  run: number
-  improve: number
-}
-
-export interface CostCapBucketDto {
-  limitUsd: number
-  usedUsd: number
-  blocked: boolean
-}
-
-export interface CostCapDto {
-  daily: CostCapBucketDto
-  monthly: CostCapBucketDto
-}
-
-export interface QuotaDto {
-  date: string
-  limits: QuotaLimitsDto
-  usage: QuotaUsageCountsDto
-  remaining: QuotaRemainingDto
-  costCap: CostCapDto
-}
 
 /**
  * Admin / analytics DTOs.

@@ -27,12 +27,13 @@ const MAX_TAGS_PER_PROMPT = 50
  */
 export async function PUT(
   request: NextRequest,
-  context: { params: { promptId: string } },
+  context: { params: Promise<{ promptId: string }> },
 ): Promise<
   NextResponse<PromptTagsReplaceSuccessResponse | PromptTagsErrorResponse>
 > {
   try {
-    const promptId = validatePromptId(context.params.promptId)
+    const { promptId: rawPromptId } = await context.params
+    const promptId = validatePromptId(rawPromptId)
     const { client, userId } = await getSupabaseClientAndUserId(request, {
       routeId: "/api/prompts/[promptId]/tags",
     })

@@ -33,15 +33,16 @@ const PROMPT_SUMMARY_MAX_LENGTH = 1_000
  */
 export async function POST(
   request: NextRequest,
-  context: { params: { promptId: string; versionId: string } },
+  context: { params: Promise<{ promptId: string; versionId: string }> },
 ): Promise<
   NextResponse<
     PromptVersionRestoreSuccessResponse | PromptVersionRestoreErrorResponse
   >
 > {
   try {
-    const promptId = validatePromptId(context.params.promptId)
-    const versionId = validateVersionId(context.params.versionId)
+    const { promptId: rawPromptId, versionId: rawVersionId } = await context.params
+    const promptId = validatePromptId(rawPromptId)
+    const versionId = validateVersionId(rawVersionId)
 
     const { client, userId } = await getSupabaseClientAndUserId(request, {
       routeId: "/api/prompts/[promptId]/versions/[versionId]/restore",

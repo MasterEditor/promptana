@@ -18,10 +18,11 @@ const ROUTE_ID = "/api/runs/[runId]"
 
 export async function GET(
   request: NextRequest,
-  context: { params: { runId: string } },
+  context: { params: Promise<{ runId: string }> },
 ): Promise<NextResponse<RunDetailSuccessResponse | RunDetailErrorResponse>> {
   try {
-    const runId = assertUuidPathParam("runId", context.params.runId) as RunId
+    const { runId: rawRunId } = await context.params
+    const runId = assertUuidPathParam("runId", rawRunId) as RunId
 
     const { client, userId } = await getSupabaseClientAndUserId(request, {
       routeId: ROUTE_ID,

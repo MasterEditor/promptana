@@ -21,10 +21,11 @@ const TAG_NAME_MAX_LENGTH = 255
  */
 export async function PATCH(
   request: NextRequest,
-  context: { params: { tagId: string } },
+  context: { params: Promise<{ tagId: string }> },
 ): Promise<NextResponse<TagsUpdateSuccessResponse | TagsByIdErrorResponse>> {
   try {
-    const tagId = validateTagId(context.params.tagId)
+    const { tagId: rawTagId } = await context.params
+    const tagId = validateTagId(rawTagId)
     const { client, userId } = await getSupabaseClientAndUserId(request, {
       routeId: "/api/tags/[tagId]",
     })
@@ -51,10 +52,11 @@ export async function PATCH(
  */
 export async function DELETE(
   request: NextRequest,
-  context: { params: { tagId: string } },
+  context: { params: Promise<{ tagId: string }> },
 ): Promise<NextResponse<TagsDeleteSuccessResponse | TagsByIdErrorResponse>> {
   try {
-    const tagId = validateTagId(context.params.tagId)
+    const { tagId: rawTagId } = await context.params
+    const tagId = validateTagId(rawTagId)
     const { client, userId } = await getSupabaseClientAndUserId(request, {
       routeId: "/api/tags/[tagId]",
     })

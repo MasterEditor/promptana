@@ -27,14 +27,15 @@ const CATALOG_DESCRIPTION_MAX_LENGTH = 2000
  */
 export async function PATCH(
   request: NextRequest,
-  context: { params: { catalogId: string } },
+  context: { params: Promise<{ catalogId: string }> },
 ): Promise<
   NextResponse<
     CatalogsUpdateSuccessResponse | CatalogsByIdErrorResponse
   >
 > {
   try {
-    const catalogId = validateCatalogId(context.params.catalogId)
+    const { catalogId: rawCatalogId } = await context.params
+    const catalogId = validateCatalogId(rawCatalogId)
     const { client, userId } = await getSupabaseClientAndUserId(request, {
       routeId: "/api/catalogs/[catalogId]",
     })
@@ -68,14 +69,15 @@ export async function PATCH(
  */
 export async function DELETE(
   request: NextRequest,
-  context: { params: { catalogId: string } },
+  context: { params: Promise<{ catalogId: string }> },
 ): Promise<
   NextResponse<
     CatalogsDeleteSuccessResponse | CatalogsByIdErrorResponse
   >
 > {
   try {
-    const catalogId = validateCatalogId(context.params.catalogId)
+    const { catalogId: rawCatalogId } = await context.params
+    const catalogId = validateCatalogId(rawCatalogId)
     const { client, userId } = await getSupabaseClientAndUserId(request, {
       routeId: "/api/catalogs/[catalogId]",
     })

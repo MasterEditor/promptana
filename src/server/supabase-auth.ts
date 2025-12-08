@@ -71,11 +71,22 @@ export async function getSupabaseClientAndUserId(
       authError,
     )
 
-    if (authError.status === 401) {
+    // Treat most auth errors as 401 UNAUTHORIZED to allow token refresh.
+    // This includes: expired tokens, invalid tokens, malformed JWTs, etc.
+    // Only treat actual server/network errors as 500.
+    const isAuthError =
+      authError.status === 401 ||
+      authError.status === 403 ||
+      authError.message?.toLowerCase().includes("jwt") ||
+      authError.message?.toLowerCase().includes("token") ||
+      authError.message?.toLowerCase().includes("expired") ||
+      authError.message?.toLowerCase().includes("invalid")
+
+    if (isAuthError) {
       throw new ApiError({
         status: 401,
         code: "UNAUTHORIZED",
-        message: "Invalid or expired Supabase session.",
+        message: "Session expired. Please sign in again.",
       })
     }
 

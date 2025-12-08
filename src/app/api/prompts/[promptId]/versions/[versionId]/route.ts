@@ -23,15 +23,16 @@ type PromptVersionGetErrorResponse = ErrorResponseDto
  */
 export async function GET(
   request: NextRequest,
-  context: { params: { promptId: string; versionId: string } },
+  context: { params: Promise<{ promptId: string; versionId: string }> },
 ): Promise<
   NextResponse<
     PromptVersionGetSuccessResponse | PromptVersionGetErrorResponse
   >
 > {
   try {
-    const promptId = validatePromptId(context.params.promptId)
-    const versionId = validateVersionId(context.params.versionId)
+    const { promptId: rawPromptId, versionId: rawVersionId } = await context.params
+    const promptId = validatePromptId(rawPromptId)
+    const versionId = validateVersionId(rawVersionId)
 
     const { client, userId } = await getSupabaseClientAndUserId(request, {
       routeId: "/api/prompts/[promptId]/versions/[versionId]",

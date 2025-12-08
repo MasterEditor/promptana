@@ -37,14 +37,15 @@ interface ListQueryParams {
  */
 export async function GET(
   request: NextRequest,
-  context: { params: { promptId: string } },
+  context: { params: Promise<{ promptId: string }> },
 ): Promise<
   NextResponse<
     PromptVersionsListSuccessResponse | PromptVersionsErrorResponse
   >
 > {
   try {
-    const promptId = validatePromptId(context.params.promptId)
+    const { promptId: rawPromptId } = await context.params
+    const promptId = validatePromptId(rawPromptId)
     const { page, pageSize } = validateListQuery(
       request.nextUrl.searchParams,
     )
@@ -83,14 +84,15 @@ export async function GET(
  */
 export async function POST(
   request: NextRequest,
-  context: { params: { promptId: string } },
+  context: { params: Promise<{ promptId: string }> },
 ): Promise<
   NextResponse<
     PromptVersionsCreateSuccessResponse | PromptVersionsErrorResponse
   >
 > {
   try {
-    const promptId = validatePromptId(context.params.promptId)
+    const { promptId: rawPromptId } = await context.params
+    const promptId = validatePromptId(rawPromptId)
 
     const { client, userId } = await getSupabaseClientAndUserId(request, {
       routeId: "/api/prompts/[promptId]/versions",

@@ -5,12 +5,32 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="58b05fbb-79c4-4850-936b-9d957f9cc784" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.ai/prd.md" beforeDir="false" afterPath="$PROJECT_DIR$/.ai/prd.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/app/(workspace)/_auth/auth-context.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/(workspace)/_auth/auth-context.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/(workspace)/_components/app-shell.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/(workspace)/_components/app-shell.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/app/(workspace)/_components/auth-gate.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/(workspace)/_components/auth-gate.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/app/(workspace)/_components/sign-in-required-panel.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/(workspace)/_components/sign-in-required-panel.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/app/(workspace)/_components/top-bar.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/(workspace)/_components/top-bar.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/(workspace)/_contexts/quota-context.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/(workspace)/prompts/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/(workspace)/prompts/page.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/app/(workspace)/view-types.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/(workspace)/view-types.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/api/catalogs/[catalogId]/route.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/api/catalogs/[catalogId]/route.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/api/prompts/[promptId]/route.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/api/prompts/[promptId]/route.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/api/prompts/[promptId]/runs/route.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/api/prompts/[promptId]/runs/route.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/api/prompts/[promptId]/tags/route.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/api/prompts/[promptId]/tags/route.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/api/prompts/[promptId]/versions/[versionId]/restore/route.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/api/prompts/[promptId]/versions/[versionId]/restore/route.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/api/prompts/[promptId]/versions/[versionId]/route.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/api/prompts/[promptId]/versions/[versionId]/route.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/api/prompts/[promptId]/versions/route.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/api/prompts/[promptId]/versions/route.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/api/runs/[runId]/route.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/api/runs/[runId]/route.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/api/tags/[tagId]/route.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/api/tags/[tagId]/route.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/globals.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/globals.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/ui/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/ui/index.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/server/current-user-service.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/server/current-user-service.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/server/quota-service.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/server/supabase-auth.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/server/supabase-auth.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/types.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/types.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -88,7 +108,10 @@
       <workItem from="1764612677804" duration="477000" />
       <workItem from="1764687724219" duration="7521000" />
       <workItem from="1764794346845" duration="4277000" />
-      <workItem from="1764879402832" duration="3290000" />
+      <workItem from="1764879402832" duration="4539000" />
+      <workItem from="1764942536973" duration="1336000" />
+      <workItem from="1764977373090" duration="3860000" />
+      <workItem from="1765024259707" duration="3326000" />
     </task>
     <servers />
   </component>

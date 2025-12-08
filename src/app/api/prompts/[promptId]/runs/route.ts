@@ -16,10 +16,6 @@ import { getSupabaseClientAndUserId } from "@/server/supabase-auth"
 import { assertUuidPathParam } from "@/server/validation"
 import * as runsService from "@/server/runs-service"
 import { callOpenRouter } from "@/server/openrouter-service"
-import {
-  checkAndIncrementRunQuota,
-  checkRunRateLimit,
-} from "@/server/quota-service"
 
 type RunsListSuccessResponse = RunListResponseDto
 type RunsCreateSuccessResponse = CreateRunResponseDto
@@ -46,12 +42,13 @@ const ALLOWED_MODELS = new Set<string>([
 
 export async function GET(
   request: NextRequest,
-  context: { params: { promptId: string } },
+  context: { params: Promise<{ promptId: string }> },
 ): Promise<NextResponse<RunsListSuccessResponse | RunsErrorResponse>> {
   try {
+    const { promptId: rawPromptId } = await context.params
     const promptId = assertUuidPathParam(
       "promptId",
-      context.params.promptId,
+      rawPromptId,
     ) as PromptId
 
     const { client, userId } = await getSupabaseClientAndUserId(request, {
@@ -79,12 +76,13 @@ export async function GET(
 
 export async function POST(
   request: NextRequest,
-  context: { params: { promptId: string } },
+  context: { params: Promise<{ promptId: string }> },
 ): Promise<NextResponse<RunsCreateSuccessResponse | RunsErrorResponse>> {
   try {
+    const { promptId: rawPromptId } = await context.params
     const promptId = assertUuidPathParam(
       "promptId",
-      context.params.promptId,
+      rawPromptId,
     ) as PromptId
 
     const { client, userId } = await getSupabaseClientAndUserId(request, {
@@ -93,14 +91,6 @@ export async function POST(
 
     const rawBody = await parseJsonBody(request)
     const command = validateCreateRunBody(rawBody)
-
-    await checkAndIncrementRunQuota(userId)
-
-    const ipHeader =
-      request.headers.get("x-forwarded-for") ?? request.headers.get("X-Forwarded-For")
-    const ip = ipHeader ? ipHeader.split(",")[0]?.trim() ?? null : null
-
-    await checkRunRateLimit(userId, ip)
 
     // Determine the effective prompt text: prefer overridePrompt when provided
     // and non-empty; otherwise load the current version content for the prompt.

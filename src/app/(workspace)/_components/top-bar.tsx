@@ -6,12 +6,10 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { useAuthContext } from "../_auth/auth-context"
 import { useOfflineContext } from "../_contexts/offline-context"
-import { useQuotaContext } from "../_contexts/quota-context"
 import { useGlobalMessagesContext } from "../_contexts/global-messages-context"
 
 export function TopBar() {
   const { user } = useAuthContext()
-  const { summary } = useQuotaContext()
   const { isOffline } = useOfflineContext()
   const { addMessage } = useGlobalMessagesContext()
 
@@ -49,11 +47,6 @@ export function TopBar() {
 
     router.push(`/search?${next.toString()}`)
   }
-
-  const quotaLabel =
-    summary != null
-      ? `Runs left: ${summary.remainingRun}, Improves left: ${summary.remainingImprove}`
-      : "Quota: unavailable"
 
   return (
     <header className="flex h-14 items-center justify-between border-b border-zinc-200 bg-white px-4 text-sm dark:border-zinc-800 dark:bg-zinc-950 md:px-6">
@@ -95,9 +88,6 @@ export function TopBar() {
       </form>
 
       <div className="flex items-center gap-4">
-        <span className="hidden text-xs text-zinc-500 dark:text-zinc-400 md:inline">
-          {quotaLabel}
-        </span>
         <div className="flex items-center gap-2">
           <span className="hidden text-xs text-zinc-600 dark:text-zinc-300 sm:inline">
             {user.email}

@@ -12,42 +12,11 @@ import * as userSettingsService from "@/server/user-settings-service"
 
 type TypedSupabaseClient = SupabaseClient<Database>
 
-const DEFAULT_DAILY_RUN_QUOTA = 20
-const DEFAULT_DAILY_IMPROVE_QUOTA = 20
-
-function parseQuota(
-  rawValue: string | undefined,
-  defaultValue: number,
-): number {
-  if (!rawValue) {
-    return defaultValue
-  }
-
-  const parsed = Number(rawValue)
-
-  if (!Number.isFinite(parsed) || parsed <= 0) {
-    return defaultValue
-  }
-
-  return Math.floor(parsed)
-}
-
 function buildCurrentUserSettingsDto(
   settings: UserSettingsDto,
 ): CurrentUserSettingsDto {
-  const dailyRunQuota = parseQuota(
-    process.env.RUN_DAILY_QUOTA,
-    DEFAULT_DAILY_RUN_QUOTA,
-  )
-  const dailyImproveQuota = parseQuota(
-    process.env.IMPROVE_DAILY_QUOTA,
-    DEFAULT_DAILY_IMPROVE_QUOTA,
-  )
-
   return {
     retentionPolicy: settings.retentionPolicy,
-    dailyRunQuota,
-    dailyImproveQuota,
   }
 }
 
@@ -55,7 +24,7 @@ function buildCurrentUserSettingsDto(
  * Compose the authenticated user's profile and derived application settings.
  *
  * This helper is used by GET /api/me to keep the route handler thin and to
- * centralize any future changes to how quotas or settings are derived.
+ * centralize any future changes to how settings are derived.
  */
 export async function getCurrentUser(
   client: TypedSupabaseClient,

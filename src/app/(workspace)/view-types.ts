@@ -4,7 +4,6 @@ import type {
   CurrentUserDto,
   ErrorCode,
   ErrorResponseDto,
-  QuotaDto,
   TagId,
 } from "@/types"
 
@@ -43,16 +42,6 @@ export interface TopBarSearchState {
   catalogId?: CatalogId | null
 }
 
-export interface QuotaSummaryVm {
-  remainingRun: number
-  remainingImprove: number
-  runUsagePercent: number
-  improveUsagePercent: number
-  isDailyRunCapReached: boolean
-  isDailyImproveCapReached: boolean
-  isAnyCostCapBlocked: boolean
-}
-
 export type GlobalMessageType = "info" | "success" | "warning" | "error"
 
 export interface GlobalMessage {
@@ -66,14 +55,6 @@ export interface GlobalMessage {
 export interface OfflineState {
   isOffline: boolean
   lastChangedAt: Date | null
-}
-
-export interface QuotaContextValue {
-  quota: QuotaDto | null
-  summary: QuotaSummaryVm | null
-  isLoading: boolean
-  error: ErrorResponseDto | null
-  refresh(): Promise<void>
 }
 
 export interface GlobalMessagesContextValue {

@@ -148,17 +148,6 @@ Non-functional limits:
 
 All user stories below include unique IDs and acceptance criteria. Each acceptance criterion is specific and testable.
 
-US-001
-
-- Title: Sign in with Google OAuth
-- Description: As a user, I want to sign in using Google OAuth so I can access my prompts securely.
-- Acceptance Criteria:
-  - User can initiate Google OAuth sign-in from the UI.
-  - After OAuth flow, user is authenticated and redirected to the app home within the same browser session.
-  - Session persists across page reloads until sign-out or session expiry.
-  - All server endpoints reject requests without a valid session.
-  - Test: Complete OAuth flow and verify a 200 response for authenticated-only endpoints.
-
 US-002
 
 - Title: Sign in with Email (optional)

@@ -25,12 +25,13 @@ type PromptDetailErrorResponse = ErrorResponseDto
  */
 export async function GET(
   request: NextRequest,
-  context: { params: { promptId: string } },
+  context: { params: Promise<{ promptId: string }> },
 ): Promise<
   NextResponse<PromptDetailSuccessResponse | PromptDetailErrorResponse>
 > {
   try {
-    const promptId = validatePromptId(context.params.promptId)
+    const { promptId: rawPromptId } = await context.params
+    const promptId = validatePromptId(rawPromptId)
 
     const { client, userId } = await getSupabaseClientAndUserId(request, {
       routeId: "/api/prompts/[promptId]",
@@ -64,12 +65,13 @@ export async function GET(
  */
 export async function PATCH(
   request: NextRequest,
-  context: { params: { promptId: string } },
+  context: { params: Promise<{ promptId: string }> },
 ): Promise<
   NextResponse<PromptDetailSuccessResponse | PromptDetailErrorResponse>
 > {
   try {
-    const promptId = validatePromptId(context.params.promptId)
+    const { promptId: rawPromptId } = await context.params
+    const promptId = validatePromptId(rawPromptId)
 
     const { client, userId } = await getSupabaseClientAndUserId(request, {
       routeId: "/api/prompts/[promptId]",
@@ -105,10 +107,11 @@ export async function PATCH(
  */
 export async function DELETE(
   request: NextRequest,
-  context: { params: { promptId: string } },
+  context: { params: Promise<{ promptId: string }> },
 ): Promise<NextResponse<PromptDetailErrorResponse>> {
   try {
-    const promptId = validatePromptId(context.params.promptId)
+    const { promptId: rawPromptId } = await context.params
+    const promptId = validatePromptId(rawPromptId)
 
     const { client, userId } = await getSupabaseClientAndUserId(request, {
       routeId: "/api/prompts/[promptId]",
