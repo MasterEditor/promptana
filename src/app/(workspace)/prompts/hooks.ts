@@ -1062,7 +1062,7 @@ export function useRunPrompt(
 
     try {
       const command: CreateRunCommand = {
-        model: "default", // can be refined based on settings later
+        model: "openrouter/auto",
         input: {
           variables: {},
           overridePrompt: getCurrentPromptContent(),
@@ -1144,7 +1144,7 @@ export function useImprovePrompt(
 
     try {
       const command: ImprovePromptCommand = {
-        model: "default", // can be refined later
+        model: "openrouter/auto",
         input: {
           currentPrompt: getCurrentPromptContent(),
         },

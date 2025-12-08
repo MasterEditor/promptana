@@ -46,8 +46,12 @@ function buildRequestBody(
     body.temperature = options.temperature
   }
 
+  // Set max_tokens - use provided value or a reasonable default to avoid
+  // exceeding API credit limits (some models default to very high values)
   if (options?.maxTokens !== undefined) {
     body.max_tokens = options.maxTokens
+  } else {
+    body.max_tokens = 4096
   }
 
   return body

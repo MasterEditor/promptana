@@ -1,6 +1,7 @@
 'use client'
 
 import { useMemo, useState } from "react"
+import { toast } from "sonner"
 
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -13,7 +14,7 @@ import {
 } from "@/components/ui/popover"
 import { Textarea } from "@/components/ui/textarea"
 
-import type { CatalogId, PromptId, TagId } from "@/types"
+import type { CatalogId, PromptId, RunDto, TagId } from "@/types"
 
 import {
   useImprovePrompt,
@@ -70,6 +71,9 @@ export function PromptDetailOverviewView({
     changeSuggestionDraft,
     saveSuggestion,
   } = useImprovePrompt(promptId, () => state.editor.draftContent)
+
+  // Store the most recent run result to display immediately after execution
+  const [latestRunResult, setLatestRunResult] = useState<RunDto | null>(null)
 
   const canSave = useMemo(
     () =>
@@ -265,8 +269,11 @@ export function PromptDetailOverviewView({
               type="button"
               size="sm"
               disabled={!canSave}
-              onClick={() => {
-                void savePrompt()
+              onClick={async () => {
+                await savePrompt()
+                if (!state.editor.formErrorMessage && Object.keys(state.editor.fieldErrors).length === 0) {
+                  toast.success("Prompt saved successfully")
+                }
               }}
             >
               {editor.isSavingVersion || editor.isSavingMetadataOnly
@@ -278,8 +285,21 @@ export function PromptDetailOverviewView({
               type="button"
               size="sm"
               disabled={!canRun}
-              onClick={() => {
-                void runPrompt()
+              onClick={async () => {
+                setLatestRunResult(null)
+                const result = await runPrompt()
+                if (result) {
+                  setLatestRunResult(result)
+                  if (result.status === "success") {
+                    toast.success("Prompt executed successfully")
+                  } else if (result.status === "error") {
+                    toast.error(result.errorMessage || "Run failed")
+                  } else if (result.status === "timeout") {
+                    toast.error("Run timed out")
+                  }
+                  // Also reload the prompt to update lastRun info
+                  await reloadPrompt()
+                }
               }}
             >
               {isRunning ? "Running..." : "Run"}
@@ -301,12 +321,13 @@ export function PromptDetailOverviewView({
               type="button"
               size="sm"
               variant="outline"
-              onClick={() => {
-                void navigator.clipboard
-                  .writeText(editor.draftContent)
-                  .catch(() => {
-                    // Silent failure; a future iteration can surface this via toast.
-                  })
+              onClick={async () => {
+                try {
+                  await navigator.clipboard.writeText(editor.draftContent)
+                  toast.success("Copied to clipboard")
+                } catch {
+                  toast.error("Failed to copy to clipboard")
+                }
               }}
             >
               Copy
@@ -334,6 +355,69 @@ export function PromptDetailOverviewView({
 
       <PromptResultPanel prompt={prompt} />
 
+      {/* Latest run result - shown immediately after running */}
+      {latestRunResult ? (
+        <Card className={latestRunResult.status === "success" ? "border-green-200 dark:border-green-800" : "border-red-200 dark:border-red-800"}>
+          <CardHeader className="flex flex-row items-center justify-between py-3">
+            <CardTitle className="text-sm">
+              Run Result
+              <span className={`ml-2 text-xs font-normal ${
+                latestRunResult.status === "success" 
+                  ? "text-green-600 dark:text-green-400" 
+                  : "text-red-600 dark:text-red-400"
+              }`}>
+                ({latestRunResult.status})
+              </span>
+            </CardTitle>
+            <Button
+              type="button"
+              size="sm"
+              variant="ghost"
+              className="h-7 px-2 text-xs"
+              onClick={() => setLatestRunResult(null)}
+            >
+              Dismiss
+            </Button>
+          </CardHeader>
+          <CardContent className="space-y-3 py-3">
+            {latestRunResult.status === "success" && latestRunResult.output?.text ? (
+              <div className="space-y-2">
+                <div className="text-xs text-zinc-500 dark:text-zinc-400">
+                  Output:
+                </div>
+                <div className="rounded-md bg-zinc-100 p-3 dark:bg-zinc-800">
+                  <pre className="whitespace-pre-wrap text-xs text-zinc-800 dark:text-zinc-200">
+                    {latestRunResult.output.text}
+                  </pre>
+                </div>
+                <div className="flex flex-wrap gap-4 text-[11px] text-zinc-500 dark:text-zinc-400">
+                  {latestRunResult.model ? <span>Model: {latestRunResult.model}</span> : null}
+                  {typeof latestRunResult.latencyMs === "number" ? (
+                    <span>Latency: {latestRunResult.latencyMs}ms</span>
+                  ) : null}
+                  {latestRunResult.tokenUsage ? (
+                    <span>
+                      Tokens: {latestRunResult.tokenUsage.inputTokens} in / {latestRunResult.tokenUsage.outputTokens} out
+                    </span>
+                  ) : null}
+                </div>
+              </div>
+            ) : (
+              <div className="space-y-2">
+                <p className="text-xs text-red-600 dark:text-red-400">
+                  {latestRunResult.errorMessage || "Run failed"}
+                </p>
+                {typeof latestRunResult.latencyMs === "number" ? (
+                  <p className="text-[11px] text-zinc-500 dark:text-zinc-400">
+                    Latency: {latestRunResult.latencyMs}ms
+                  </p>
+                ) : null}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      ) : null}
+
       {/* Improve suggestions panel placeholder for now */}
       {improveState.isOpen ? (
         <Card>
@@ -350,13 +434,20 @@ export function PromptDetailOverviewView({
             </Button>
           </CardHeader>
           <CardContent className="space-y-3 py-3">
+            {improveState.isLoading ? (
+              <div className="flex items-center gap-2 py-4 text-xs text-zinc-600 dark:text-zinc-300">
+                <div className="h-4 w-4 animate-spin rounded-full border-2 border-zinc-300 border-t-zinc-600 dark:border-zinc-600 dark:border-t-zinc-300" />
+                <span>Generating improvement suggestions...</span>
+              </div>
+            ) : null}
+
             {improveState.error ? (
               <p className="text-xs text-red-600 dark:text-red-400">
                 {improveState.error.error.message}
               </p>
             ) : null}
 
-            {improveState.suggestions.length === 0 && !improveState.isLoading ? (
+            {improveState.suggestions.length === 0 && !improveState.isLoading && !improveState.error ? (
               <p className="text-xs text-zinc-600 dark:text-zinc-300">
                 No suggestions returned.
               </p>
@@ -411,8 +502,10 @@ export function PromptDetailOverviewView({
                                 state.prompt?.currentVersionId ?? null,
                               )
                               if (result) {
-                                // After saving, reload the prompt so the improved version
-                                // becomes the new current version.
+                                // Close the improve panel and reload the prompt so
+                                // the improved version becomes the new current version.
+                                closePanel()
+                                toast.success("Improved version saved successfully")
                                 await reloadPrompt()
                               }
                             }}

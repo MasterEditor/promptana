@@ -4,7 +4,6 @@
 ### 1. Resources
 
 - **User (`auth.users`)**: Authenticated Supabase user; referenced by `user_id` in all domain tables.
-- **User settings (`user_settings`)**: Per-user configuration for version retention and quotas.
 - **Catalogs (`catalogs`)**: Optional grouping for prompts.
 - **Prompts (`prompts`)**: Top-level prompt entities with metadata, search vector, links to current version and last run.
 - **Prompt versions (`prompt_versions`)**: Version history of prompt content, with summaries and metadata.
@@ -56,7 +55,7 @@ Supabase handles OAuth/email sign-in via its own endpoints and JS client; the ap
 - **Get current user**
   - **Method**: GET  
   - **URL**: `/api/me`
-  - **Description**: Return the authenticated user profile and derived app settings; used by the UI to gate access.
+  - **Description**: Return the authenticated user profile; used by the UI to gate access.
   - **Query parameters**: none
   - **Request body**: none
   - **Response 200**:
@@ -65,12 +64,7 @@ Supabase handles OAuth/email sign-in via its own endpoints and JS client; the ap
 {
   "id": "uuid",
   "email": "user@example.com",
-  "createdAt": "2024-01-01T00:00:00.000Z",
-  "settings": {
-    "retentionPolicy": "fourteen_days",
-    "dailyRunQuota": 20,
-    "dailyImproveQuota": 20
-  }
+  "createdAt": "2024-01-01T00:00:00.000Z"
 }
 ```
 
@@ -93,66 +87,7 @@ Supabase handles OAuth/email sign-in via its own endpoints and JS client; the ap
     - **500 INTERNAL_ERROR**: Failed to revoke session.
 
 
-#### 2.2 User Settings (`user_settings`)
-
-User settings configure retention behavior and may expose quotas.
-
-- **Get current user's settings**
-  - **Method**: GET
-  - **URL**: `/api/settings`
-  - **Description**: Return settings for the authenticated user. Reads from `user_settings` or falls back to defaults.
-  - **Query parameters**: none
-  - **Request body**: none
-  - **Response 200**:
-
-```json
-{
-  "userId": "uuid",
-  "retentionPolicy": "thirty_days",
-  "createdAt": "2024-01-01T00:00:00.000Z",
-  "updatedAt": "2024-01-02T00:00:00.000Z"
-}
-```
-
-  - **Success codes**:
-    - **200 OK**: Settings returned.
-  - **Error codes**:
-    - **401 UNAUTHORIZED**
-    - **500 INTERNAL_ERROR**
-
-- **Update current user's settings**
-  - **Method**: PUT
-  - **URL**: `/api/settings`
-  - **Description**: Update retention policy (and, optionally in future, quota values).
-  - **Query parameters**: none
-  - **Request body**:
-
-```json
-{
-  "retentionPolicy": "fourteen_days"
-}
-```
-
-  - **Response 200**:
-
-```json
-{
-  "userId": "uuid",
-  "retentionPolicy": "fourteen_days",
-  "createdAt": "2024-01-01T00:00:00.000Z",
-  "updatedAt": "2024-01-03T00:00:00.000Z"
-}
-```
-
-  - **Success codes**:
-    - **200 OK**: Settings updated.
-  - **Error codes**:
-    - **400 BAD_REQUEST**: Unknown field or invalid JSON.
-    - **422 VALIDATION_FAILED**: `retentionPolicy` not in `['fourteen_days','thirty_days','always']`.
-    - **401 UNAUTHORIZED**
-
-
-#### 2.3 Catalogs (`catalogs`)
+#### 2.2 Catalogs (`catalogs`)
 
 - **List catalogs**
   - **Method**: GET
@@ -255,7 +190,7 @@ User settings configure retention behavior and may expose quotas.
     - **409 CONFLICT**: If UI/DB constraints require reassignment but no reassignment provided.
 
 
-#### 2.4 Tags (`tags`) and Prompt–Tag Links (`prompt_tags`)
+#### 2.3 Tags (`tags`) and Prompt–Tag Links (`prompt_tags`)
 
 - **List tags**
   - **Method**: GET
@@ -354,7 +289,7 @@ Prompt–tag associations are primarily managed via the prompt endpoints (see be
 ```
 
 
-#### 2.5 Prompts (`prompts`)
+#### 2.4 Prompts (`prompts`)
 
 Prompt list and detail must support search, filtering, and last-run preview.
 
@@ -561,7 +496,7 @@ Prompt list and detail must support search, filtering, and last-run preview.
     - Log a `run_events` entry with `event_type = "delete"`.
 
 
-#### 2.6 Prompt Versions (`prompt_versions`)
+#### 2.5 Prompt Versions (`prompt_versions`)
 
 **Version representation**
 
@@ -667,7 +602,7 @@ Prompt list and detail must support search, filtering, and last-run preview.
     - Log `run_events` with `event_type = "restore"`.
 
 
-#### 2.7 Runs (`runs`) and Execution
+#### 2.6 Runs (`runs`) and Execution
 
 Runs track executions of prompts via OpenRouter and power both UX and quota enforcement.
 
@@ -786,7 +721,7 @@ Runs track executions of prompts via OpenRouter and power both UX and quota enfo
   - **Response 200**: Full run representation as above.
 
 
-#### 2.8 Improve Workflow (AI Suggestions)
+#### 2.7 Improve Workflow (AI Suggestions)
 
 The "Improve" flow uses an execution-like endpoint but distinguishes analytics and quotas.
 
@@ -839,7 +774,7 @@ The "Improve" flow uses an execution-like endpoint but distinguishes analytics a
     - Saving an accepted suggestion is done via `POST /api/prompts/{promptId}/versions` with `source = "improve"`.
 
 
-#### 2.9 Search
+#### 2.8 Search
 
 Although `GET /api/prompts` supports search, a dedicated endpoint can expose more advanced capabilities.
 
@@ -881,7 +816,7 @@ Although `GET /api/prompts` supports search, a dedicated endpoint can expose mor
 ```
 
 
-#### 2.10 Quotas and Usage
+#### 2.9 Quotas and Usage
 
 - **Get current usage and quotas**
   - **Method**: GET
@@ -921,7 +856,7 @@ Although `GET /api/prompts` supports search, a dedicated endpoint can expose mor
 ```
 
 
-#### 2.11 Analytics and Run Events (`run_events`) – Operator/Admin
+#### 2.10 Analytics and Run Events (`run_events`) – Operator/Admin
 
 These endpoints are intended for operators and may be protected behind an admin flag or separate environment; they can be omitted from the public UI.
 

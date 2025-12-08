@@ -10,17 +10,8 @@
 
 ### 1.2 Enums
 - `CREATE TYPE run_status AS ENUM ('pending','success','error','timeout');`
-- `CREATE TYPE retention_policy AS ENUM ('fourteen_days','thirty_days','always');`
 
-### 1.3 `user_settings`
-| column | type | constraints |
-| --- | --- | --- |
-| `user_id` | UUID | PRIMARY KEY, REFERENCES `auth.users(id)` ON DELETE CASCADE |
-| `retention_policy` | `retention_policy` | NOT NULL DEFAULT 'thirty_days' |
-| `created_at` | timestamptz | NOT NULL DEFAULT now() |
-| `updated_at` | timestamptz | NOT NULL DEFAULT now() |
-
-### 1.4 `catalogs`
+### 1.3 `catalogs`
 | column | type | constraints |
 | --- | --- | --- |
 | `id` | UUID | PRIMARY KEY DEFAULT gen_random_uuid() |
@@ -30,7 +21,7 @@
 | `created_at` | timestamptz | NOT NULL DEFAULT now() |
 | `updated_at` | timestamptz | NOT NULL DEFAULT now() |
 
-### 1.5 `prompts`
+### 1.4 `prompts`
 | column | type | constraints |
 | --- | --- | --- |
 | `id` | UUID | PRIMARY KEY DEFAULT gen_random_uuid() |
@@ -43,7 +34,7 @@
 | `created_at` | timestamptz | NOT NULL DEFAULT now() |
 | `updated_at` | timestamptz | NOT NULL DEFAULT now() |
 
-### 1.6 `prompt_versions`
+### 1.5 `prompt_versions`
 | column | type | constraints |
 | --- | --- | --- |
 | `id` | UUID | PRIMARY KEY DEFAULT gen_random_uuid() |
@@ -55,7 +46,7 @@
 | `created_by` | UUID | NOT NULL REFERENCES `auth.users(id)` ON DELETE CASCADE |
 | `created_at` | timestamptz | NOT NULL DEFAULT now() |
 
-### 1.7 `tags`
+### 1.6 `tags`
 | column | type | constraints |
 | --- | --- | --- |
 | `id` | UUID | PRIMARY KEY DEFAULT gen_random_uuid() |
@@ -63,7 +54,7 @@
 | `name` | TEXT | NOT NULL, UNIQUE (user_id, lower(name)) |
 | `created_at` | timestamptz | NOT NULL DEFAULT now() |
 
-### 1.8 `prompt_tags`
+### 1.7 `prompt_tags`
 | column | type | constraints |
 | --- | --- | --- |
 | `prompt_id` | UUID | NOT NULL REFERENCES `prompts(id)` ON DELETE CASCADE |
@@ -73,7 +64,7 @@
 | *primary key* | (`prompt_id`, `tag_id`) |
 | *data guard* | trigger ensures `user_id` matches owning prompt/tag |
 
-### 1.9 `runs`
+### 1.8 `runs`
 | column | type | constraints |
 | --- | --- | --- |
 | `id` | UUID | PRIMARY KEY DEFAULT gen_random_uuid() |
@@ -89,7 +80,7 @@
 | `error_message` | TEXT | NULL |
 | `created_at` | timestamptz | NOT NULL DEFAULT now() |
 
-### 1.10 `run_events` (optional KPI logging)
+### 1.9 `run_events` (optional KPI logging)
 | column | type | constraints |
 | --- | --- | --- |
 | `id` | UUID | PRIMARY KEY DEFAULT gen_random_uuid() |
@@ -100,12 +91,11 @@
 | `created_at` | timestamptz | NOT NULL DEFAULT now() |
 
 2. **Relationships between tables**
-- `auth.users 1─∞ {prompts, prompt_versions, runs, tags, catalogs, user_settings, run_events}` via `user_id`.
+- `auth.users 1─∞ {prompts, prompt_versions, runs, tags, catalogs, run_events}` via `user_id`.
 - `catalogs 1─∞ prompts`; deleting a catalog cascades through prompts and their dependent rows (versions, runs, tags via cascades).
 - `prompts 1─∞ prompt_versions` with `prompts.current_version_id` pointing to latest version.
 - `prompts 1─∞ runs`; `prompts.last_run_id` references most recent run.
 - `tags ∞─∞ prompts` realized with `prompt_tags`.
-- `user_settings 1─1 users` storing per-user retention policy.
 - `run_events` provide analytics trace linked to users (and optionally prompts).
 
 3. **Indexes**
@@ -123,7 +113,7 @@
 - Enable RLS on every user-owned table:
   ```sql
   ALTER TABLE prompts ENABLE ROW LEVEL SECURITY;
-  -- repeat for prompt_versions, catalogs, tags, prompt_tags, runs, user_settings, run_events.
+  -- repeat for prompt_versions, catalogs, tags, prompt_tags, runs, run_events.
   ```
 - Example policy (apply per table with matching semantics):
   ```sql
@@ -144,7 +134,6 @@
 
 5. **Additional notes**
 - Full-text search: trigger keeps `prompts.search_vector` in sync with `prompts.title`, the latest version content (loaded via `current_version_id`), and associated `catalog.name` (setweight A/B/C). All searches hit GIN index.
-- Retention: nightly `pg_cron` job prunes `prompt_versions` whose `created_at` is older than policy defined in `user_settings`; `retention_policy = 'always'` skips pruning.
 - Prompt size enforcement: `prompt_versions.content` check constraint guarantees Max 100k chars; validation should also run in Supabase edge functions/UI to fail fast.
 - Redis handles daily quota enforcement; Postgres stores only durable artifacts (optional `run_events`) for KPI tracking.
 - Deletion flow: deleting a catalog cascades through prompts and dependent tables, so the UI must obtain explicit confirmation before issuing destructive operations; there is no soft-delete/trash layer.
