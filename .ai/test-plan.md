@@ -7,11 +7,9 @@ Niniejszy plan testów określa strategię, zakres, metody i harmonogram testowa
 
 ### 1.2 Cele Testowania
 - **Weryfikacja funkcjonalności**: Potwierdzenie, że wszystkie wymagania funkcjonalne (FR-001 do FR-013) zostały poprawnie zaimplementowane
-- **Zapewnienie jakości**: Zapewnienie wysokiej jakości kodu, wydajności i bezpieczeństwa aplikacji
-- **Walidacja integracji**: Weryfikacja poprawnej integracji z zewnętrznymi serwisami (Supabase Auth, OpenRouter, PostgreSQL)
+- **Zapewnienie jakości**: Zapewnienie wysokiej jakości kodu poprzez testy jednostkowe i end-to-end
 - **Wykrycie defektów**: Identyfikacja i dokumentacja błędów przed wdrożeniem produkcyjnym
-- **Potwierdzenie KPI**: Weryfikacja, że system spełnia określone metryki sukcesu (czas odpowiedzi < 4s, wskaźnik improve-to-save ≥ 80%)
-- **Zapewnienie bezpieczeństwa**: Weryfikacja mechanizmów autentykacji, autoryzacji i zabezpieczeń przed atakami
+- **Weryfikacja user experience**: Potwierdzenie, że wszystkie user stories działają poprawnie end-to-end
 
 ### 1.3 Zakres Projektu
 Promptana to aplikacja webowa MVP typu single-user do zarządzania promptami AI z następującymi kluczowymi funkcjonalnościami:
@@ -86,7 +84,10 @@ Promptana to aplikacja webowa MVP typu single-user do zarządzania promptami AI 
 - PostgreSQL (full-text search)
 
 ### 2.2 Obszary Wyłączone z Testów
-- Testy wydajnościowe infrastruktury cloud (poza zakresem MVP)
+- Dedykowane testy integracyjne (logika integracyjna weryfikowana w testach E2E)
+- Dedykowane testy wydajnościowe (monitoring w produkcji)
+- Dedykowane testy bezpieczeństwa (best practices w kodzie, weryfikacja w E2E)
+- Dedykowane testy accessibility (WCAG compliance weryfikowana manualnie)
 - Testy wieloużytkownikowe (MVP jest single-user)
 - Testy zaawansowanych dashboardów analitycznych (nie w MVP)
 - Testy migracji z innych systemów (brak takiej funkcjonalności)
@@ -107,6 +108,8 @@ Promptana to aplikacja webowa MVP typu single-user do zarządzania promptami AI 
 - Komponenty UI (rendering, props, interakcje)
 - Custom hooki React
 - Funkcje transformacji danych
+- API routes logic (z mockowanymi zależnościami)
+- Logika biznesowa (prompts, versions, tags, catalogs, runs, search)
 
 **Przykładowe scenariusze**:
 ```typescript
@@ -124,6 +127,11 @@ Promptana to aplikacja webowa MVP typu single-user do zarządzania promptami AI 
 - Button renderuje się poprawnie z różnymi wariantami
 - Input obsługuje zdarzenia onChange
 - Dialog otwiera i zamyka się poprawnie
+
+// Serwisy (z mockami)
+- prompts-service: CRUD operations logic
+- search-service: search query building
+- openrouter-service: request formatting
 ```
 
 **Metryki sukcesu**:
@@ -131,65 +139,20 @@ Promptana to aplikacja webowa MVP typu single-user do zarządzania promptami AI 
 - Pokrycie kodu: ≥ 70% dla komponentów UI
 - Wszystkie testy przechodzą w < 10s
 
-### 3.2 Testy Integracyjne (Integration Tests)
+### 3.2 Testy End-to-End (E2E Tests)
 
 **Priorytet**: ★★★★★ (Wysoki)
-
-**Narzędzia**: Jest, Supertest (dla API), Testcontainers (PostgreSQL)
-
-**Zakres**:
-- API routes z rzeczywistą bazą danych testową
-- Przepływ danych między warstwami (route → service → database)
-- Integracja z Supabase Auth (mockowane lub testowe środowisko)
-- Integracja z OpenRouter (mockowane)
-- Triggery i funkcje bazodanowe
-- Row Level Security policies
-
-**Przykładowe scenariusze**:
-```
-AUTH-INT-001: Pełny flow rejestracji i logowania
-AUTH-INT-002: Odświeżanie tokena sesji
-AUTH-INT-003: Wylogowanie i invalidacja sesji
-
-PROMPT-INT-001: Utworzenie promptu tworzy też pierwszą wersję
-PROMPT-INT-002: Aktualizacja promptu tworzy nową wersję i aktualizuje current_version_id
-PROMPT-INT-003: Usunięcie promptu usuwa cascade wszystkie wersje i uruchomienia
-PROMPT-INT-004: Uruchomienie promptu zapisuje wynik i aktualizuje last_run_id
-
-SEARCH-INT-001: search_vector jest automatycznie aktualizowany przez trigger
-SEARCH-INT-002: Wyszukiwanie znajduje prompty po tytule, contencie i katalogu
-SEARCH-INT-003: Filtrowanie po tagach działa poprawnie
-
-RLS-INT-001: Użytkownik A nie może zobaczyć promptów użytkownika B
-RLS-INT-002: Polityki RLS blokują nieautoryzowany dostęp
-
-TAG-INT-001: Trigger sprawdza ownership przy przypisywaniu tagów
-```
-
-**Konfiguracja środowiska testowego**:
-```typescript
-// Użycie Testcontainers dla izolacji
-- Kontener PostgreSQL z zastosowanymi migracjami
-- Mock Supabase Auth z testowymi użytkownikami
-- Mock OpenRouter z predefinowanymi odpowiedziami
-```
-
-**Metryki sukcesu**:
-- Wszystkie krytyczne przepływy pokryte testami
-- Testy wykonują się w < 60s
-- 100% ścieżek API przetestowanych
-
-### 3.3 Testy End-to-End (E2E Tests)
-
-**Priorytet**: ★★★★☆ (Średni-Wysoki)
 
 **Narzędzia**: Playwright
 
 **Zakres**:
 - Pełne user journey od logowania do wykonania zadania
 - Testy scenariuszy opisanych w PRD (US-001 do US-030)
-- Testy na różnych przeglądarkach (Chrome, Firefox, Safari)
-- Testy responsive design (desktop, tablet, mobile)
+- Testy na różnych przeglądarkach (Chrome, Firefox, WebKit)
+- Integracja z rzeczywistą bazą danych i serwisami
+- Row Level Security verification
+- Triggery i funkcje bazodanowe
+- Przepływ danych end-to-end (UI → API → Database → UI)
 
 **Przykładowe scenariusze (według User Stories)**:
 
@@ -228,164 +191,9 @@ E2E-US-011: Workflow "Improve"
 
 **Metryki sukcesu**:
 - Wszystkie user stories (US-001 do US-030) mają testy E2E
-- Testy wykonują się w < 5 minut
+- Testy wykonują się w < 10 minut
 - Success rate ≥ 95%
-
-### 3.4 Testy Wydajnościowe (Performance Tests)
-
-**Priorytet**: ★★★☆☆ (Średni)
-
-**Narzędzia**: k6, Lighthouse, WebPageTest
-
-**Zakres**:
-- Pomiar czasu odpowiedzi API
-- Pomiar czasu ładowania stron
-- Testy obciążeniowe (concurrent users)
-- Analiza bundle size
-- Analiza wydajności bazy danych (slow queries)
-
-**Scenariusze**:
-```
-PERF-001: Czas odpowiedzi OpenRouter
-  - Średni czas < 4s (KPI requirement)
-  - 95 percentyl < 6s
-  - Timeout po 10s
-
-PERF-002: Wyszukiwanie pełnotekstowe
-  - 1000 promptów: czas wyszukiwania < 500ms
-  - 10000 promptów: czas wyszukiwania < 1s
-  - Weryfikacja użycia indeksu GIN
-
-PERF-003: Ładowanie listy promptów
-  - 100 promptów: < 1s
-  - Paginacja: 20 itemów per page
-  - Infinite scroll: następna strona < 500ms
-
-PERF-004: Bundle size
-  - Initial bundle < 200KB (gzipped)
-  - TTI (Time to Interactive) < 3s
-  - LCP (Largest Contentful Paint) < 2.5s
-
-PERF-005: Concurrent users
-  - 10 użytkowników: średni czas odpowiedzi bez degradacji
-  - 50 użytkowników: maksymalnie 2x wolniejsze odpowiedzi
-```
-
-**Metryki sukcesu**:
-- OpenRouter średni czas < 4s
-- Lighthouse score ≥ 90 dla Performance
-- Brak slow queries (> 1s)
-
-### 3.5 Testy Bezpieczeństwa (Security Tests)
-
-**Priorytet**: ★★★★★ (Krytyczny)
-
-**Narzędzia**: OWASP ZAP, npm audit, Snyk
-
-**Zakres**:
-- Testy autentykacji i autoryzacji
-- Testy Row Level Security
-- Analiza zależności (vulnerabilities)
-- Testy injection (SQL, NoSQL, XSS)
-- Testy CSRF protection
-- Audyt bezpieczeństwa API keys
-
-**Scenariusze**:
-```
-SEC-001: Nieautoryzowany dostęp do API
-  - Wywołanie API bez tokena → 401
-  - Wywołanie API z nieprawidłowym tokenem → 401
-  - Dostęp do promptu innego użytkownika → 403
-
-SEC-002: Row Level Security
-  - User A tworzy prompt
-  - User B próbuje odczytać prompt User A → 0 wyników
-  - User B próbuje zaktualizować prompt User A → błąd
-
-SEC-003: SQL Injection
-  - Wstrzyknięcie SQL w pola tekstowe (tytuł, content)
-  - Weryfikacja: parametryzowane zapytania
-  - Brak wykonania złośliwego SQL
-
-SEC-004: XSS (Cross-Site Scripting)
-  - Wstrzyknięcie <script> w content promptu
-  - Weryfikacja: output jest escaped
-  - Skrypt nie jest wykonywany
-
-SEC-005: OpenRouter Key Security
-  - Klucz API nigdy nie jest wysyłany do klienta
-  - Klucz jest bezpiecznie przechowywany (zmienne środowiskowe)
-  - Brak logowania klucza w plaintext
-
-SEC-006: Walidacja inputów
-  - Content > 100000 znaków → 400 Bad Request
-  - Summary > 1000 znaków → 400 Bad Request
-  - Nieprawidłowy UUID → 400 Bad Request
-  - Weryfikacja wszystkich field validators
-```
-
-**Metryki sukcesu**:
-- Zero critical/high vulnerabilities w npm audit
-- Wszystkie testy OWASP Top 10 przechodzą
-- 100% endpointów API wymaga autentykacji
-
-### 3.6 Testy Dostępności (Accessibility Tests)
-
-**Priorytet**: ★★★☆☆ (Średni)
-
-**Narzędzia**: axe-core, Pa11y, Lighthouse
-
-**Zakres**:
-- WCAG 2.1 AA compliance
-- Keyboard navigation
-- Screen reader compatibility
-- Kontrast kolorów
-- ARIA labels
-
-**Scenariusze**:
-```
-A11Y-001: Nawigacja klawiaturą
-  - Wszystkie główne akcje dostępne przez Tab
-  - Focus indicators są widoczne
-  - Escape zamyka modalne
-  - Enter/Space aktywuje buttony
-
-A11Y-002: Screen Reader
-  - Wszystkie interaktywne elementy mają labels
-  - ARIA labels dla ikon
-  - Alt text dla obrazów
-  - Semantic HTML (nav, main, aside)
-
-A11Y-003: Kontrast kolorów
-  - Wszystkie teksty spełniają WCAG AA (4.5:1)
-  - Przyciski spełniają WCAG AA (3:1)
-
-A11Y-004: Formularze
-  - Labels powiązane z inputami
-  - Error messages są ogłaszane przez screen reader
-  - Required fields są oznaczone
-```
-
-**Metryki sukcesu**:
-- Lighthouse Accessibility score ≥ 90
-- Zero critical issues w axe-core
-- Wszystkie główne funkcje dostępne z klawiatury
-
-### 3.7 Testy Regresji (Regression Tests)
-
-**Priorytet**: ★★★★☆ (Średni-Wysoki)
-
-**Zakres**:
-- Automatyczne testy po każdym PR
-- Testy przed każdym release
-- Visual regression testing (snapshot)
-- Weryfikacja, że poprawki nie psują istniejącej funkcjonalności
-
-**Strategie**:
-- CI/CD pipeline z automatycznymi testami
-- Branch protection rules (testy muszą przejść)
-- Snapshot testing dla komponentów UI
-- Database state verification
+- Wszystkie krytyczne przepływy integracyjne pokryte (auth, RLS, database triggers)
 
 ## 4. Scenariusze Testowe dla Kluczowych Funkcjonalności
 
@@ -396,29 +204,28 @@ A11Y-004: Formularze
 | AUTH-001 | Rejestracja nowego użytkownika przez email | Wysoki | E2E |
 | AUTH-002 | Logowanie przez Google OAuth | Wysoki | E2E |
 | AUTH-003 | Logowanie przez email | Wysoki | E2E |
-| AUTH-004 | Wylogowanie i invalidacja sesji | Wysoki | Integration |
-| AUTH-005 | Odświeżanie tokena sesji | Wysoki | Integration |
+| AUTH-004 | Wylogowanie i invalidacja sesji | Wysoki | E2E |
+| AUTH-005 | Odświeżanie tokena sesji | Wysoki | E2E |
 | AUTH-006 | Dostęp do chronionej strony bez logowania → redirect | Wysoki | E2E |
-| AUTH-007 | Token expiration handling | Średni | Integration |
-| AUTH-008 | Concurrent sessions (same user) | Niski | Integration |
+| AUTH-007 | Token expiration handling | Średni | E2E |
 
 ### 4.2 Zarządzanie Promptami (PROMPT)
 
 | ID | Scenariusz | Priorytet | Typ |
 |----|-----------|-----------|-----|
 | PROMPT-001 | Utworzenie nowego promptu z wszystkimi polami | Wysoki | E2E |
-| PROMPT-002 | Utworzenie promptu z minimalnym zestawem pól | Wysoki | Integration |
+| PROMPT-002 | Utworzenie promptu z minimalnym zestawem pól | Wysoki | E2E |
 | PROMPT-003 | Edycja istniejącego promptu | Wysoki | E2E |
 | PROMPT-004 | Usunięcie promptu z potwierdzeniem | Wysoki | E2E |
 | PROMPT-005 | Lista promptów z paginacją | Wysoki | E2E |
-| PROMPT-006 | Sortowanie promptów (updated_at DESC) | Średni | Integration |
+| PROMPT-006 | Sortowanie promptów (updated_at DESC) | Średni | E2E |
 | PROMPT-007 | Filtrowanie po katalogu | Średni | E2E |
-| PROMPT-008 | Prompt bez katalogu (catalog_id = NULL) | Średni | Integration |
+| PROMPT-008 | Prompt bez katalogu (catalog_id = NULL) | Średni | E2E |
 | PROMPT-009 | Walidacja: tytuł jest wymagany | Wysoki | Unit |
-| PROMPT-010 | Walidacja: content max 100k znaków | Wysoki | Integration |
-| PROMPT-011 | Utworzenie promptu tworzy initial version | Krytyczny | Integration |
-| PROMPT-012 | Aktualizacja promptu tworzy nową wersję | Krytyczny | Integration |
-| PROMPT-013 | current_version_id wskazuje na najnowszą wersję | Krytyczny | Integration |
+| PROMPT-010 | Walidacja: content max 100k znaków | Wysoki | Unit |
+| PROMPT-011 | Utworzenie promptu tworzy initial version | Krytyczny | E2E |
+| PROMPT-012 | Aktualizacja promptu tworzy nową wersję | Krytyczny | E2E |
+| PROMPT-013 | current_version_id wskazuje na najnowszą wersję | Krytyczny | E2E |
 
 ### 4.3 Wersjonowanie (VERSION)
 
@@ -426,26 +233,26 @@ A11Y-004: Formularze
 |----|-----------|-----------|-----|
 | VER-001 | Lista wersji promptu | Wysoki | E2E |
 | VER-002 | Przywrócenie starej wersji | Wysoki | E2E |
-| VER-003 | Przywrócenie tworzy nową wersję (restore action) | Wysoki | Integration |
+| VER-003 | Przywrócenie tworzy nową wersję (restore action) | Wysoki | E2E |
 | VER-004 | Historia wersji pokazuje summary i timestamp | Średni | E2E |
-| VER-005 | Version retention: pruning po 14 dniach | Średni | Integration |
-| VER-006 | Version retention: pruning po 30 dniach | Średni | Integration |
-| VER-007 | Version retention: "always" - brak pruning | Średni | Integration |
-| VER-008 | Usunięcie promptu usuwa wszystkie wersje | Wysoki | Integration |
+| VER-005 | Version retention: pruning po 14 dniach | Średni | E2E |
+| VER-006 | Version retention: pruning po 30 dniach | Średni | E2E |
+| VER-007 | Version retention: "always" - brak pruning | Średni | E2E |
+| VER-008 | Usunięcie promptu usuwa wszystkie wersje (cascade) | Wysoki | E2E |
 
 ### 4.4 Tagi (TAG)
 
 | ID | Scenariusz | Priorytet | Typ |
 |----|-----------|-----------|-----|
 | TAG-001 | Utworzenie nowego tagu | Wysoki | E2E |
-| TAG-002 | Lista tagów użytkownika | Wysoki | Integration |
+| TAG-002 | Lista tagów użytkownika | Wysoki | E2E |
 | TAG-003 | Przypisanie tagu do promptu | Wysoki | E2E |
 | TAG-004 | Usunięcie tagu z promptu | Wysoki | E2E |
-| TAG-005 | Usunięcie tagu usuwa powiązania z promptami | Wysoki | Integration |
-| TAG-006 | Tag name jest unique per user (case-insensitive) | Średni | Integration |
+| TAG-005 | Usunięcie tagu usuwa powiązania z promptami | Wysoki | E2E |
+| TAG-006 | Tag name jest unique per user (case-insensitive) | Średni | E2E |
 | TAG-007 | Filtrowanie promptów po tagu | Wysoki | E2E |
-| TAG-008 | Prompt może mieć wiele tagów | Średni | Integration |
-| TAG-009 | Trigger sprawdza ownership przy tag assignment | Krytyczny | Integration |
+| TAG-008 | Prompt może mieć wiele tagów | Średni | E2E |
+| TAG-009 | Trigger sprawdza ownership przy tag assignment | Krytyczny | E2E |
 
 ### 4.5 Katalogi (CATALOG)
 
@@ -454,11 +261,11 @@ A11Y-004: Formularze
 | CAT-001 | Utworzenie nowego katalogu | Wysoki | E2E |
 | CAT-002 | Edycja katalogu | Średni | E2E |
 | CAT-003 | Usunięcie pustego katalogu | Wysoki | E2E |
-| CAT-004 | Usunięcie katalogu z promptami (cascade) | Wysoki | Integration |
-| CAT-005 | Catalog name jest unique per user (case-insensitive) | Średni | Integration |
+| CAT-004 | Usunięcie katalogu z promptami (cascade) | Wysoki | E2E |
+| CAT-005 | Catalog name jest unique per user (case-insensitive) | Średni | E2E |
 | CAT-006 | Przypisanie promptu do katalogu | Wysoki | E2E |
 | CAT-007 | Zmiana katalogu promptu | Średni | E2E |
-| CAT-008 | Usunięcie przypisania katalogu (NULL) | Średni | Integration |
+| CAT-008 | Usunięcie przypisania katalogu (NULL) | Średni | E2E |
 
 ### 4.6 Wyszukiwanie (SEARCH)
 
@@ -468,13 +275,12 @@ A11Y-004: Formularze
 | SEARCH-002 | Wyszukiwanie po contencie promptu | Wysoki | E2E |
 | SEARCH-003 | Wyszukiwanie po nazwie katalogu | Średni | E2E |
 | SEARCH-004 | Wyszukiwanie po tagach | Wysoki | E2E |
-| SEARCH-005 | Wyszukiwanie z wieloma słowami kluczowymi | Wysoki | Integration |
-| SEARCH-006 | Wyszukiwanie phrase search (cudzysłów) | Średni | Integration |
-| SEARCH-007 | Wyszukiwanie zwraca wyniki sorted by relevance | Średni | Integration |
-| SEARCH-008 | Trigger aktualizuje search_vector przy CREATE | Krytyczny | Integration |
-| SEARCH-009 | Trigger aktualizuje search_vector przy UPDATE | Krytyczny | Integration |
-| SEARCH-010 | Indeks GIN jest używany (EXPLAIN ANALYZE) | Średni | Performance |
-| SEARCH-011 | Empty search query zwraca wszystkie prompty | Niski | Integration |
+| SEARCH-005 | Wyszukiwanie z wieloma słowami kluczowymi | Wysoki | E2E |
+| SEARCH-006 | Wyszukiwanie phrase search (cudzysłów) | Średni | E2E |
+| SEARCH-007 | Wyszukiwanie zwraca wyniki sorted by relevance | Średni | E2E |
+| SEARCH-008 | Trigger aktualizuje search_vector przy CREATE | Krytyczny | E2E |
+| SEARCH-009 | Trigger aktualizuje search_vector przy UPDATE | Krytyczny | E2E |
+| SEARCH-010 | Empty search query zwraca wszystkie prompty | Niski | E2E |
 
 ### 4.7 Wykonywanie Promptów (RUN)
 
@@ -482,16 +288,15 @@ A11Y-004: Formularze
 |----|-----------|-----------|-----|
 | RUN-001 | Wykonanie promptu - success | Krytyczny | E2E |
 | RUN-002 | Wykonanie promptu - error handling | Krytyczny | E2E |
-| RUN-003 | Wykonanie zapisuje run record | Krytyczny | Integration |
-| RUN-004 | last_run_id jest aktualizowany | Wysoki | Integration |
+| RUN-003 | Wykonanie zapisuje run record | Krytyczny | E2E |
+| RUN-004 | last_run_id jest aktualizowany | Wysoki | E2E |
 | RUN-005 | Historia runów dla promptu | Wysoki | E2E |
-| RUN-006 | Metadata: latency_ms, token_usage, model | Średni | Integration |
-| RUN-007 | Status: pending → success | Średni | Integration |
-| RUN-008 | Status: pending → error (z error_message) | Wysoki | Integration |
-| RUN-009 | Timeout po 10s → status timeout | Średni | Integration |
-| RUN-010 | Czas wykonania < 4s (P95) | Krytyczny | Performance |
-| RUN-011 | OpenRouter API call (mocked) | Wysoki | Integration |
-| RUN-012 | Event "run" jest zapisywany w run_events | Średni | Integration |
+| RUN-006 | Metadata: latency_ms, token_usage, model | Średni | E2E |
+| RUN-007 | Status: pending → success | Średni | E2E |
+| RUN-008 | Status: pending → error (z error_message) | Wysoki | E2E |
+| RUN-009 | Timeout po 10s → status timeout | Średni | E2E |
+| RUN-010 | OpenRouter API call formatting | Wysoki | Unit |
+| RUN-011 | Event "run" jest zapisywany w run_events | Średni | E2E |
 
 ### 4.8 Workflow "Improve" (IMPROVE)
 
@@ -500,22 +305,21 @@ A11Y-004: Formularze
 | IMP-001 | Click "Improve" → otrzymanie sugestii | Krytyczny | E2E |
 | IMP-002 | Wybór sugestii i zapisanie jako nowa wersja | Krytyczny | E2E |
 | IMP-003 | Edycja sugestii przed zapisaniem | Wysoki | E2E |
-| IMP-004 | Event "improve" jest zapisywany | Średni | Integration |
-| IMP-005 | Event "improve_saved" przy zapisaniu | Wysoki | Integration |
+| IMP-004 | Event "improve" jest zapisywany | Średni | E2E |
+| IMP-005 | Event "improve_saved" przy zapisaniu | Wysoki | E2E |
 | IMP-006 | Wiele sugestii - wybór jednej | Średni | E2E |
-| IMP-007 | Improve używa OpenRouter (mocked) | Wysoki | Integration |
+| IMP-007 | Improve request formatting | Wysoki | Unit |
 | IMP-008 | Error handling przy improve | Wysoki | E2E |
-| IMP-009 | KPI: improve_saved / improve ratio | Średni | Integration |
+| IMP-009 | KPI: improve_saved / improve ratio | Średni | E2E |
 
 ### 4.9 Row Level Security (RLS)
 
 | ID | Scenariusz | Priorytet | Typ |
 |----|-----------|-----------|-----|
-| RLS-001 | User A nie widzi promptów User B | Krytyczny | Integration |
-| RLS-002 | User A nie może edytować promptów User B | Krytyczny | Integration |
-| RLS-003 | User A nie może usunąć promptów User B | Krytyczny | Integration |
-| RLS-004 | Polityki RLS dla wszystkich tabel | Krytyczny | Integration |
-| RLS-005 | Service role może bypass RLS | Średni | Integration |
+| RLS-001 | User A nie widzi promptów User B | Krytyczny | E2E |
+| RLS-002 | User A nie może edytować promptów User B | Krytyczny | E2E |
+| RLS-003 | User A nie może usunąć promptów User B | Krytyczny | E2E |
+| RLS-004 | Polityki RLS dla wszystkich tabel | Krytyczny | E2E |
 
 ## 5. Środowisko Testowe
 
@@ -532,8 +336,8 @@ A11Y-004: Formularze
 #### 5.1.2 CI/CD Environment (GitHub Actions)
 ```yaml
 - Node.js: 20.x
-- PostgreSQL: 15.x (Testcontainer)
 - Przeglądarki: Chrome (latest), Firefox (latest), Webkit (latest)
+- PostgreSQL: dostęp do test database (dla E2E testów)
 ```
 
 #### 5.1.3 Staging Environment
@@ -599,31 +403,14 @@ A11Y-004: Formularze
 
 | Kategoria | Narzędzie | Wersja | Użycie |
 |-----------|----------|--------|--------|
-| Test Runner | Jest | ^29.x | Testy jednostkowe i integracyjne |
+| Test Runner | Jest | ^29.x | Testy jednostkowe |
 | E2E Testing | Playwright | ^1.40 | Testy end-to-end |
 | React Testing | React Testing Library | ^14.x | Testy komponentów React |
-| API Testing | Supertest | ^6.x | Testy HTTP API |
-| Mocking | MSW (Mock Service Worker) | ^2.x | Mockowanie requestów |
-| Containers | Testcontainers | ^10.x | PostgreSQL dla testów |
-| Coverage | Istanbul/NYC | ^15.x | Pokrycie kodu |
+| Mocking | MSW (Mock Service Worker) | ^2.x | Mockowanie requestów w testach unit |
 | Linting | ESLint | ^9.x | Analiza statyczna |
 | Type Checking | TypeScript | ^5.x | Sprawdzanie typów |
 
-### 6.2 Narzędzia Dodatkowe
-
-| Kategoria | Narzędzie | Użycie |
-|-----------|----------|--------|
-| Performance | Lighthouse | Audyt wydajności i dostępności |
-| Performance | k6 | Testy obciążeniowe |
-| Security | npm audit | Skanowanie zależności |
-| Security | OWASP ZAP | Testy penetracyjne |
-| Security | Snyk | Ciągłe monitorowanie vulnerabilities |
-| Accessibility | axe-core | Testy dostępności |
-| Accessibility | Pa11y | Automatyczne testy WCAG |
-| Visual Testing | Percy / Chromatic | Visual regression testing |
-| Documentation | Storybook | Dokumentacja i testy komponentów |
-
-### 6.3 CI/CD Pipeline
+### 6.2 CI/CD Pipeline
 
 ```yaml
 name: Test Pipeline
@@ -637,40 +424,22 @@ jobs:
   
   unit-tests:
     - Jest unit tests
-    - Coverage report (≥80%)
-  
-  integration-tests:
-    - Testcontainers setup (PostgreSQL)
-    - Apply migrations
-    - Run integration tests
-    - Teardown containers
+    - Coverage report
   
   e2e-tests:
     - Playwright tests
     - 3 browsers (Chromium, Firefox, Webkit)
     - Upload test artifacts
-  
-  security:
-    - npm audit
-    - Snyk scan
-  
-  performance:
-    - Lighthouse CI
-    - Bundle size check
-  
-  accessibility:
-    - axe-core tests
 ```
 
 ## 7. Harmonogram Testów
 
-### 7.1 Faza 1: Przygotowanie (Tydzień 1-2)
+### 7.1 Faza 1: Przygotowanie (Tydzień 1)
 
 **Działania**:
 - [ ] Setup środowiska testowego
 - [ ] Konfiguracja Jest + React Testing Library
 - [ ] Konfiguracja Playwright
-- [ ] Setup Testcontainers
 - [ ] Przygotowanie danych testowych (seeds)
 - [ ] Implementacja mocków (OpenRouter, Supabase Auth)
 - [ ] Setup CI/CD pipeline
@@ -690,8 +459,9 @@ jobs:
 - [ ] Testy komponentów UI (Button, Input, Dialog, etc.)
 - [ ] Testy custom hooków
 - [ ] Testy utility functions
+- [ ] Testy serwisów (z mockowanymi zależnościami)
 
-**Cel pokrycia**: ≥80% dla testowanych modułów
+**Cel pokrycia**: ≥80% dla warstwy serwisowej, ≥70% dla komponentów UI
 
 **Odpowiedzialni**: Frontend Developer, Backend Developer
 
@@ -699,35 +469,17 @@ jobs:
 - ~100-150 testów jednostkowych
 - Coverage report
 
-### 7.3 Faza 3: Testy Integracyjne (Tydzień 3-5)
+### 7.3 Faza 3: Testy E2E (Tydzień 4-6)
 
-**Priorytet 1 (Tydzień 3-4)**: Krytyczne ścieżki
-- [ ] Auth integration tests (AUTH-INT-001 do 003)
-- [ ] Prompt CRUD integration tests (PROMPT-INT-001 do 004)
-- [ ] RLS integration tests (RLS-INT-001 do 002)
-- [ ] Search integration tests (SEARCH-INT-001 do 003)
-
-**Priorytet 2 (Tydzień 4-5)**: Pozostałe
-- [ ] Tag integration tests
-- [ ] Catalog integration tests
-- [ ] Version integration tests
-- [ ] Run integration tests
-
-**Odpowiedzialni**: Backend Developer, QA Engineer
-
-**Deliverables**:
-- ~80-100 testów integracyjnych
-- Dokumentacja testowanych scenariuszy
-
-### 7.4 Faza 4: Testy E2E (Tydzień 5-7)
-
-**Tydzień 5-6**: Implementacja testów
+**Tydzień 4-5**: Implementacja testów
 - [ ] E2E dla wszystkich User Stories (US-001 do US-030)
 - [ ] Happy paths
 - [ ] Error scenarios
 - [ ] Edge cases
+- [ ] RLS verification
+- [ ] Database triggers verification
 
-**Tydzień 7**: Stabilizacja i flaky tests
+**Tydzień 6**: Stabilizacja i flaky tests
 - [ ] Naprawa niestabilnych testów
 - [ ] Optymalizacja czasu wykonania
 - [ ] Retry strategies
@@ -738,26 +490,10 @@ jobs:
 - ~30-40 testów E2E
 - Test report z coverage wszystkich user stories
 
-### 7.5 Faza 5: Testy Specjalistyczne (Tydzień 7-8)
-
-**Działania równoległe**:
-- [ ] Performance testing (k6, Lighthouse)
-- [ ] Security testing (OWASP ZAP, npm audit)
-- [ ] Accessibility testing (axe-core, Pa11y)
-- [ ] Visual regression testing
-
-**Odpowiedzialni**: QA Engineer, Security Engineer (konsultacja)
-
-**Deliverables**:
-- Performance report
-- Security audit report
-- Accessibility compliance report
-- Visual regression baseline
-
-### 7.6 Faza 6: Regresja i Release (Tydzień 8-9)
+### 7.4 Faza 4: Release (Tydzień 7)
 
 **Działania**:
-- [ ] Pełny regression test suite
+- [ ] Pełny test suite run
 - [ ] Bug fixing
 - [ ] Re-testing
 - [ ] Sign-off
@@ -775,14 +511,12 @@ jobs:
 - Known issues list
 - Release notes
 
-### 7.7 Continuous Testing (Post-Release)
+### 7.5 Continuous Testing (Post-Release)
 
 **Działania cykliczne**:
 - Testy smoke po każdym deploymencie
-- Regression tests przy każdym PR
-- Weekly security scans
-- Monthly performance audits
-- Quarterly accessibility audits
+- Unit i E2E tests przy każdym PR
+- Monitoring production dla performance i errors
 
 ## 8. Kryteria Akceptacji Testów
 
@@ -806,36 +540,17 @@ jobs:
 - ✅ Wszystkie walidatory są pokryte
 - ✅ Edge cases są testowane
 - ✅ Error handling jest testowany
-
-**Testy Integracyjne**:
-- ✅ Wszystkie API endpoints są pokryte
-- ✅ Wszystkie triggery bazodanowe są przetestowane
-- ✅ Row Level Security działa poprawnie
-- ✅ Cascading deletes działają poprawnie
+- ✅ Logika biznesowa serwisów jest przetestowana (z mockami)
 
 **Testy E2E**:
 - ✅ Wszystkie user stories (US-001 do US-030) mają testy
 - ✅ Happy paths są pokryte
 - ✅ Error scenarios są pokryte
 - ✅ Edge cases są pokryte
-
-**Performance**:
-- ✅ OpenRouter średni czas odpowiedzi < 4s
-- ✅ Search < 1s dla 10k promptów
-- ✅ Page load time < 3s (TTI)
-- ✅ Lighthouse Performance score ≥ 90
-
-**Security**:
-- ✅ Wszystkie endpointy wymagają auth
-- ✅ RLS blokuje cross-user access
-- ✅ npm audit: 0 critical/high vulnerabilities
-- ✅ Input validation blokuje injection
-
-**Accessibility**:
-- ✅ WCAG 2.1 AA compliance
-- ✅ Keyboard navigation działa
-- ✅ Screen reader compatibility
-- ✅ Lighthouse Accessibility score ≥ 90
+- ✅ Row Level Security działa poprawnie
+- ✅ Triggery bazodanowe działają poprawnie
+- ✅ Cascading deletes działają poprawnie
+- ✅ Wszystkie API endpoints są weryfikowane end-to-end
 
 ### 8.3 Definition of Done (DoD) dla Testów
 
@@ -847,7 +562,6 @@ Test jest uznany za "Done" gdy:
 5. ✅ Test ma jasny opis i assertion messages
 6. ✅ Test jest zrecenzowany przez przynajmniej jedną osobę
 7. ✅ Test jest udokumentowany (jeśli complex)
-8. ✅ Test jest dodany do regression suite
 
 ## 9. Role i Odpowiedzialności
 
@@ -857,7 +571,6 @@ Test jest uznany za "Done" gdy:
 - Tworzenie i utrzymanie planu testów
 - Koordynacja działań testowych
 - Implementacja testów E2E (Playwright)
-- Implementacja testów integracyjnych
 - Raportowanie błędów i śledzenie progress
 - Review test coverage
 - Weryfikacja kryteriów akceptacji
@@ -868,7 +581,7 @@ Test jest uznany za "Done" gdy:
 - Test cases documentation
 - Test reports (daily, weekly, release)
 - Bug reports
-- Test automation scripts
+- E2E test automation scripts
 
 ### 9.2 Frontend Developer
 
@@ -878,48 +591,38 @@ Test jest uznany za "Done" gdy:
 - Wsparcie przy testach E2E (selektory, test IDs)
 - Naprawa bugów frontendowych
 - Review testów frontendowych
-- Optymalizacja wydajności frontendu
 
 **Deliverables**:
 - Unit tests dla komponentów
 - Komponenty z data-testid attributes
 - Bug fixes
-- Performance optimizations
 
 ### 9.3 Backend Developer
 
 **Odpowiedzialności**:
-- Testy jednostkowe serwisów
+- Testy jednostkowe serwisów (z mockowanymi zależnościami)
 - Testy jednostkowe walidatorów
-- Testy integracyjne API routes
-- Testy integracyjne bazy danych
+- Testy jednostkowe utility functions
 - Naprawa bugów backendowych
 - Review testów backendowych
-- Optymalizacja zapytań SQL
 
 **Deliverables**:
 - Unit tests dla serwisów
-- Integration tests dla API
-- Database tests (triggers, RLS)
+- Unit tests dla walidatorów
 - Bug fixes
-- Database optimizations
 
 ### 9.4 DevOps Engineer
 
 **Odpowiedzialności**:
 - Setup CI/CD pipeline
-- Konfiguracja Testcontainers
 - Setup środowisk testowych (staging)
-- Monitorowanie performance testów
+- Monitorowanie czasu wykonania testów
 - Automatyzacja deploymentów
-- Setup narzędzi security scanning
 
 **Deliverables**:
 - CI/CD pipeline configuration
-- Testcontainers setup
 - Staging environment
 - Monitoring dashboards
-- Security scanning integration
 
 ### 9.5 Tech Lead / Architect
 
@@ -1186,16 +889,13 @@ npm test
 # Tylko unit tests
 npm run test:unit
 
-# Tylko integration tests
-npm run test:integration
-
 # Tylko E2E tests
 npm run test:e2e
 
-# Z coverage
+# Z coverage (unit tests)
 npm run test:coverage
 
-# Watch mode
+# Watch mode (unit tests)
 npm run test:watch
 
 # Specific test file
@@ -1203,22 +903,12 @@ npm test -- prompts-service.test.ts
 
 # Update snapshots
 npm test -- -u
-```
 
-#### Docker dla Testów
+# E2E w trybie headed (z widoczną przeglądarką)
+npm run test:e2e -- --headed
 
-```bash
-# Start test containers
-docker-compose -f docker-compose.test.yml up -d
-
-# Run migrations
-npm run migrate:test
-
-# Seed test data
-npm run seed:test
-
-# Stop test containers
-docker-compose -f docker-compose.test.yml down -v
+# E2E dla konkretnej przeglądarki
+npm run test:e2e -- --project=chromium
 ```
 
 ### 11.3 Checklist Pre-Release
@@ -1233,43 +923,23 @@ docker-compose -f docker-compose.test.yml down -v
 - [ ] Code reviewed and approved
 
 ### Tests
-- [ ] All unit tests pass (≥80% coverage)
-- [ ] All integration tests pass
-- [ ] All E2E tests pass (all browsers)
+- [ ] All unit tests pass (≥80% coverage dla serwisów, ≥70% dla UI)
+- [ ] All E2E tests pass (all browsers: Chromium, Firefox, WebKit)
 - [ ] No flaky tests
-- [ ] Performance tests pass (OpenRouter < 4s)
-- [ ] Security scan clean (npm audit)
-- [ ] Accessibility tests pass (Lighthouse ≥90)
+- [ ] Test execution time < 10 minutes total
 
-### Functionality
+### Functionality (E2E Verified)
 - [ ] All user stories (US-001 to US-030) verified
-- [ ] Authentication flow works
+- [ ] Authentication flow works (Google OAuth + email)
 - [ ] Prompt CRUD works
-- [ ] Search works
+- [ ] Search works (full-text)
 - [ ] Run prompt works
 - [ ] Improve workflow works
 - [ ] Version management works
-
-### Database
-- [ ] All migrations applied successfully
-- [ ] Seed data loads correctly
-- [ ] RLS policies working
-- [ ] Triggers functioning
-- [ ] Indexes created
-
-### Security
-- [ ] All API endpoints require auth
-- [ ] RLS tested and working
-- [ ] No exposed secrets in code
-- [ ] HTTPS enforced
-- [ ] Input validation working
-
-### Performance
-- [ ] Bundle size < 200KB (gzipped)
-- [ ] Page load < 3s
-- [ ] OpenRouter calls < 4s (P95)
-- [ ] Search queries < 1s
-- [ ] No memory leaks
+- [ ] Tags and catalogs work
+- [ ] RLS policies verified (multi-user isolation)
+- [ ] Database triggers functioning
+- [ ] Cascade deletes working
 
 ### Documentation
 - [ ] README updated
@@ -1282,7 +952,6 @@ docker-compose -f docker-compose.test.yml down -v
 - [ ] Staging deployment successful
 - [ ] Smoke tests on staging pass
 - [ ] Rollback plan documented
-- [ ] Monitoring configured
 
 ### Sign-off
 - [ ] QA Engineer approval
@@ -1299,78 +968,74 @@ docker-compose -f docker-compose.test.yml down -v
 
 ### 12.1 Kluczowe Priorytety Testowania
 
-1. **Security & Authentication** (P0)
-   - Row Level Security
-   - API authentication
-   - Input validation
-   - OpenRouter key security
+**Unit Tests (P0)**:
+- Wszystkie funkcje walidacyjne i utility
+- Logika biznesowa serwisów (z mockowanymi zależnościami)
+- Komponenty UI React
+- Custom hooki
+- Coverage ≥ 80% dla serwisów, ≥ 70% dla UI
 
-2. **Core Functionality** (P0)
-   - Prompt CRUD
-   - Run prompt
-   - Improve workflow
+**E2E Tests (P0)**:
+1. **Security & Authentication**
+   - Row Level Security (multi-user isolation)
+   - API authentication (Google OAuth + email)
+   - Autoryzacja dostępu do zasobów
 
-3. **Data Integrity** (P0)
-   - Versioning
+2. **Core Functionality**
+   - Prompt CRUD (pełny cykl życia)
+   - Run prompt (wykonywanie przez OpenRouter)
+   - Improve workflow (AI-driven ulepszanie)
+
+3. **Data Integrity**
+   - Wersjonowanie (tworzenie, przywracanie)
    - Cascade deletes
-   - Database triggers
-   - Search vector updates
+   - Database triggers (search_vector, ownership)
+   - Input validation end-to-end
 
-4. **User Experience** (P1)
-   - Search functionality
-   - Tags and catalogs
-   - Error handling
-   - Performance (< 4s OpenRouter)
-
-5. **Quality Assurance** (P1)
-   - Code coverage ≥ 80%
-   - E2E coverage 100% user stories
-   - Regression prevention
+4. **User Experience**
+   - Search functionality (full-text)
+   - Tags and catalogs (organizacja)
+   - Error handling (user-friendly messages)
+   - 100% user stories pokryte testami E2E
 
 ### 12.2 Success Criteria
 
 Ten plan testów będzie uznany za sukces, gdy:
 
-✅ **Jakość**:
+✅ **Jakość Kodu**:
 - Zero P0 bugs w produkcji przez pierwszy miesiąc
-- Test coverage ≥ 80% dla krytycznych modułów
+- Test coverage ≥ 80% dla warstwy serwisowej (unit tests)
+- Test coverage ≥ 70% dla komponentów UI (unit tests)
 - 100% user stories pokrytych testami E2E
 
-✅ **Wydajność**:
-- OpenRouter średni czas odpowiedzi < 4s
-- Page load time < 3s
-- Search latency < 1s dla 10k promptów
-
-✅ **Bezpieczeństwo**:
-- Zero critical/high security vulnerabilities
-- RLS działa poprawnie (verified)
-- Wszystkie endpointy chronione auth
-
-✅ **KPI**:
-- Improve-to-save rate ≥ 80%
-- Prompt trial rate ≥ 70%
-- OpenRouter error rate < 5%
+✅ **Funkcjonalność**:
+- Wszystkie krytyczne przepływy działają (verified przez E2E)
+- RLS działa poprawnie (verified przez E2E)
+- Wszystkie endpointy chronione auth (verified przez E2E)
+- Database triggers działają poprawnie (verified przez E2E)
 
 ✅ **Proces**:
 - CI/CD pipeline fully automated
 - Test execution time < 10 min (total)
 - Bug MTTR: P0 < 24h, P1 < 72h
+- Test success rate ≥ 95%
 
 ### 12.3 Continuous Improvement
 
 Po wdrożeniu MVP, plan testów będzie ciągle ulepszany poprzez:
 
 - **Retrospektywy**: Cotygodniowa analiza co działa, a co nie
-- **Metrics Review**: Miesięczna analiza metryk testowych
+- **Metrics Review**: Miesięczna analiza metryk testowych (coverage, success rate, execution time)
 - **Test Maintenance**: Regularne czyszczenie i refactoring testów
 - **New Test Cases**: Dodawanie testów dla nowych bugów (regression prevention)
-- **Performance Optimization**: Ciągła optymalizacja czasu wykonania testów
+- **Test Optimization**: Ciągła optymalizacja czasu wykonania testów (unit < 10s, E2E < 10min)
 - **Tool Evaluation**: Kwartalna ocena nowych narzędzi testowych
 
 ---
 
 **Dokument stworzony**: 8 grudnia 2024  
-**Wersja**: 1.0  
-**Status**: Draft for Review  
+**Ostatnia aktualizacja**: 8 grudnia 2024  
+**Wersja**: 2.0  
+**Status**: Simplified (Unit + E2E only)  
 **Następna aktualizacja**: Po implementacji Fazy 1
 
