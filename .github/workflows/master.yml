@@ -81,6 +81,9 @@ jobs:
       - name: Build for Cloudflare Pages
         run: npm run build:cf
 
+      - name: Copy worker to assets directory
+        run: cp .open-next/worker.js .open-next/assets/_worker.js
+
       - name: Deploy to Cloudflare Pages
         uses: cloudflare/wrangler-action@v3
         with:
