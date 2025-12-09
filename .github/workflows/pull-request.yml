@@ -79,8 +79,8 @@ jobs:
       - name: Install Playwright Chromium browser
         run: npx playwright install chromium --with-deps
 
-      - name: Run E2E tests with coverage
-        run: npm run test:e2e -- --reporter=html --reporter=list
+      - name: Run E2E tests
+        run: npm run test:e2e
 
       - name: Upload E2E test report
         uses: actions/upload-artifact@v4
@@ -89,6 +89,7 @@ jobs:
           name: e2e-test-report
           path: playwright-report/
           retention-days: 7
+          if-no-files-found: warn
 
       - name: Upload E2E test results
         uses: actions/upload-artifact@v4
@@ -97,6 +98,7 @@ jobs:
           name: e2e-test-results
           path: test-results/
           retention-days: 7
+          if-no-files-found: warn
 
   status-comment:
     name: Status Comment
@@ -108,12 +110,14 @@ jobs:
     steps:
       - name: Download unit test coverage
         uses: actions/download-artifact@v4
+        continue-on-error: true
         with:
           name: unit-test-coverage
           path: coverage/
 
       - name: Download E2E test report
         uses: actions/download-artifact@v4
+        continue-on-error: true
         with:
           name: e2e-test-report
           path: playwright-report/
