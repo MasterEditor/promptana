@@ -5,15 +5,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="58b05fbb-79c4-4850-936b-9d957f9cc784" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.ai/api-plan.md" beforeDir="false" afterPath="$PROJECT_DIR$/.ai/api-plan.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.ai/db-plan.md" beforeDir="false" afterPath="$PROJECT_DIR$/.ai/db-plan.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/app/(workspace)/prompts/PromptDetailOverviewView.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/(workspace)/prompts/PromptDetailOverviewView.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/app/(workspace)/prompts/hooks.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/(workspace)/prompts/hooks.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/app/layout.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/layout.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/server/openrouter-service.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/server/openrouter-service.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -35,28 +28,98 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;ASKED_SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
-    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
-    &quot;js.debugger.nextJs.config.created.client&quot;: &quot;true&quot;,
-    &quot;js.debugger.nextJs.config.created.server&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;npm.Next.js: server-side.executor&quot;: &quot;Debug&quot;,
-    &quot;ts.external.directory.path&quot;: &quot;C:\\Users\\FlyingTiger\\WebstormProjects\\promptana\\node_modules\\typescript\\lib&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ASKED_SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "Jest.SignInRequiredPanel.Mode Switching.executor": "Run",
+    "Jest.SignInRequiredPanel.Mode Switching.should switch from sign-up to sign-in mode.executor": "Run",
+    "Jest.SignInRequiredPanel.executor": "Run",
+    "Jest.TopBar.executor": "Debug",
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "Playwright.Auth Form UI/UX.executor": "Run",
+    "Playwright.Home Page.executor": "Run",
+    "Playwright.Session Management.executor": "Run",
+    "Playwright.Sign In.executor": "Run",
+    "Playwright.Sign Up.executor": "Run",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "git-widget-placeholder": "main",
+    "js.debugger.nextJs.config.created.client": "true",
+    "js.debugger.nextJs.config.created.server": "true",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs.jest.jest_package": "C:/Users/FlyingTiger/WebstormProjects/promptana/node_modules/jest",
+    "nodejs_package_manager_path": "npm",
+    "npm.Next.js: server-side.executor": "Debug",
+    "ts.external.directory.path": "C:\\Users\\FlyingTiger\\WebstormProjects\\promptana\\node_modules\\typescript\\lib",
+    "vue.rearranger.settings.migration": "true"
   }
-}</component>
-  <component name="RunManager" selected="npm.Next.js: server-side">
+}]]></component>
+  <component name="RunManager" selected="Playwright.Sign Up">
+    <configuration name="Auth Form UI/UX" type="JavaScriptTestRunnerPlaywright" temporary="true" nameIsGenerated="true">
+      <node-interpreter value="project" />
+      <playwright-package value="$PROJECT_DIR$/node_modules/@playwright/test" />
+      <working-dir value="$PROJECT_DIR$" />
+      <envs />
+      <scope-kind value="SUITE" />
+      <test-file value="$PROJECT_DIR$/e2e/auth/auth-ui.spec.ts" />
+      <test-names>
+        <test-name value="Auth Form UI/UX" />
+      </test-names>
+      <method v="2" />
+    </configuration>
+    <configuration name="Home Page" type="JavaScriptTestRunnerPlaywright" temporary="true" nameIsGenerated="true">
+      <node-interpreter value="project" />
+      <playwright-package value="$PROJECT_DIR$/node_modules/@playwright/test" />
+      <working-dir value="$PROJECT_DIR$" />
+      <envs />
+      <scope-kind value="SUITE" />
+      <test-file value="$PROJECT_DIR$/e2e/example.spec.ts" />
+      <test-names>
+        <test-name value="Home Page" />
+      </test-names>
+      <method v="2" />
+    </configuration>
+    <configuration name="Session Management" type="JavaScriptTestRunnerPlaywright" temporary="true" nameIsGenerated="true">
+      <node-interpreter value="project" />
+      <playwright-package value="$PROJECT_DIR$/node_modules/@playwright/test" />
+      <working-dir value="$PROJECT_DIR$" />
+      <envs />
+      <scope-kind value="SUITE" />
+      <test-file value="$PROJECT_DIR$/e2e/auth/session.spec.ts" />
+      <test-names>
+        <test-name value="Session Management" />
+      </test-names>
+      <method v="2" />
+    </configuration>
+    <configuration name="Sign In" type="JavaScriptTestRunnerPlaywright" temporary="true" nameIsGenerated="true">
+      <node-interpreter value="project" />
+      <playwright-package value="$PROJECT_DIR$/node_modules/@playwright/test" />
+      <working-dir value="$PROJECT_DIR$" />
+      <envs />
+      <scope-kind value="SUITE" />
+      <test-file value="$PROJECT_DIR$/e2e/auth/sign-in.spec.ts" />
+      <test-names>
+        <test-name value="Sign In" />
+      </test-names>
+      <method v="2" />
+    </configuration>
+    <configuration name="Sign Up" type="JavaScriptTestRunnerPlaywright" temporary="true" nameIsGenerated="true">
+      <node-interpreter value="project" />
+      <playwright-package value="$PROJECT_DIR$/node_modules/@playwright/test" />
+      <working-dir value="$PROJECT_DIR$" />
+      <envs />
+      <scope-kind value="SUITE" />
+      <test-file value="$PROJECT_DIR$/e2e/auth/sign-up.spec.ts" />
+      <test-names>
+        <test-name value="Sign Up" />
+      </test-names>
+      <method v="2" />
+    </configuration>
     <configuration name="Next.js: debug client-side" type="JavascriptDebugType" uri="http://localhost:3000/">
       <method v="2" />
     </configuration>
@@ -70,6 +133,15 @@
       <envs />
       <method v="2" />
     </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Playwright.Sign Up" />
+        <item itemvalue="Playwright.Sign In" />
+        <item itemvalue="Playwright.Session Management" />
+        <item itemvalue="Playwright.Auth Form UI/UX" />
+        <item itemvalue="Playwright.Home Page" />
+      </list>
+    </recent_temporary>
   </component>
   <component name="SharedIndexes">
     <attachedChunks>
@@ -95,7 +167,8 @@
       <workItem from="1764942536973" duration="1336000" />
       <workItem from="1764977373090" duration="3860000" />
       <workItem from="1765024259707" duration="3326000" />
-      <workItem from="1765188698795" duration="3706000" />
+      <workItem from="1765188698795" duration="9861000" />
+      <workItem from="1765275686671" duration="2902000" />
     </task>
     <servers />
   </component>

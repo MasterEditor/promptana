@@ -1,4 +1,6 @@
-export function cn(...inputs: Array<any>) {
+type ClassValue = string | number | boolean | null | undefined | ClassValue[] | Record<string, boolean | null | undefined>;
+
+export function cn(...inputs: ClassValue[]) {
   const classes: string[] = []
 
   for (const input of inputs) {
@@ -8,7 +10,7 @@ export function cn(...inputs: Array<any>) {
       classes.push(input)
     } else if (Array.isArray(input)) {
       classes.push(
-        ...input.filter((value) => typeof value === "string" && value.length > 0),
+        ...input.filter((value): value is string => typeof value === "string" && value.length > 0),
       )
     } else if (typeof input === "object") {
       for (const [key, value] of Object.entries(input)) {

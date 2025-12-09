@@ -1,5 +1,6 @@
 'use client'
 
+import Link from "next/link"
 import { useMemo, useState } from "react"
 
 import { Button } from "@/components/ui/button"
@@ -24,6 +25,7 @@ import type {
   PromptFiltersOptionsVm,
   PromptListFiltersVm,
   PromptListItemVm,
+  PromptListSort,
 } from "./view-types"
 
 interface PromptsViewProps {
@@ -219,7 +221,7 @@ function PromptFiltersBar({
             className="h-9 min-w-[8rem] rounded-md border border-zinc-300 bg-white px-2 py-1 text-xs text-zinc-900 shadow-sm outline-none focus:border-zinc-500 focus:ring-1 focus:ring-zinc-500 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-50 md:w-40"
             value={filters.sort}
             onChange={(event) =>
-              onFiltersChange({ sort: event.target.value as any })
+              onFiltersChange({ sort: event.target.value as PromptListSort })
             }
           >
             <option value="updatedAtDesc">Updated (newest)</option>
@@ -645,12 +647,12 @@ function PromptListEmptyState({
   return (
     <div className="flex flex-col items-start gap-2 rounded-md border border-dashed border-zinc-300 bg-white p-4 text-sm text-zinc-700 dark:border-zinc-700 dark:bg-zinc-950 dark:text-zinc-200">
       <p>You haven&apos;t created any prompts yet.</p>
-      <a
+      <Link
         href="/prompts/new"
         className="text-xs font-medium text-zinc-900 underline underline-offset-2 hover:text-zinc-700 dark:text-zinc-50 dark:hover:text-zinc-200"
       >
         Create your first prompt
-      </a>
+      </Link>
     </div>
   )
 }

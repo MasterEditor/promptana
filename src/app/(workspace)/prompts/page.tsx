@@ -63,11 +63,11 @@ function clampPageSize(value: number): number {
 }
 
 interface PromptsPageProps {
-  searchParams?: SearchParams
+  searchParams?: Promise<SearchParams>
 }
 
-export default function PromptsPage({ searchParams }: PromptsPageProps) {
-  const params = searchParams ?? {}
+export default async function PromptsPage({ searchParams }: PromptsPageProps) {
+  const params = (await searchParams) ?? {}
 
   const page = parseNumberParam(params.page, 1)
   const pageSize = clampPageSize(
