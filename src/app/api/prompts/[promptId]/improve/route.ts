@@ -29,7 +29,7 @@ const MAX_SUGGESTIONS = 5
 const DEFAULT_SUGGESTIONS = 3
 
 const ALLOWED_MODELS = new Set<string>([
-  "openrouter/auto",
+  "openai/gpt-3.5-turbo",
 ])
 
 const IMPROVE_SYSTEM_PROMPT = `You are an expert prompt engineer. Your task is to improve the given prompt to make it more effective, clear, and likely to produce better results from an AI assistant.

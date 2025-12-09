@@ -1062,7 +1062,7 @@ export function useRunPrompt(
 
     try {
       const command: CreateRunCommand = {
-        model: "openrouter/auto",
+        model: "openai/gpt-3.5-turbo",
         input: {
           variables: {},
           overridePrompt: getCurrentPromptContent(),
@@ -1144,7 +1144,7 @@ export function useImprovePrompt(
 
     try {
       const command: ImprovePromptCommand = {
-        model: "openrouter/auto",
+        model: "openai/gpt-3.5-turbo",
         input: {
           currentPrompt: getCurrentPromptContent(),
         },

@@ -37,7 +37,7 @@ const ALLOWED_RUN_STATUSES: RunStatus[] = [
 const ALLOWED_MODELS = new Set<string>([
   // Default to a small, conservative allow-list. This can be extended via env
   // configuration or a dedicated models endpoint in a future iteration.
-  "openrouter/auto",
+  "openai/gpt-3.5-turbo",
 ])
 
 export async function GET(
