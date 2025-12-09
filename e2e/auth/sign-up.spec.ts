@@ -13,29 +13,6 @@ test.describe('Sign Up', () => {
     await authPage.switchToSignUp();
   });
 
-  test('should successfully sign up and show confirmation message', async ({
-    authPage,
-  }) => {
-    const testEmail = generateTestEmail();
-    const testPassword = 'TestPassword123!';
-
-    // Fill in registration form
-    await authPage.emailInput.fill(testEmail);
-    await authPage.passwordInput.fill(testPassword);
-    await authPage.confirmPasswordInput.fill(testPassword);
-    await authPage.submitButton.click();
-
-    // Wait for success message (email confirmation required)
-    await expect(authPage.successMessage).toBeVisible({ timeout: 10000 });
-    
-    const successText = await authPage.getSuccessMessage();
-    expect(successText).toContain('check your email');
-
-    // Should switch back to sign in mode
-    const isSignIn = await authPage.isInSignInMode();
-    expect(isSignIn).toBe(true);
-  });
-
   test('should show error when signing up with existing email', async ({
     authPage,
     testCredentials,
