@@ -23,11 +23,11 @@ function clampPageSize(value: number): number {
 }
 
 interface CatalogsPageProps {
-  searchParams?: SearchParams
+  searchParams?: Promise<SearchParams>
 }
 
-export default function CatalogsPage({ searchParams }: CatalogsPageProps) {
-  const params = searchParams ?? {}
+export default async function CatalogsPage({ searchParams }: CatalogsPageProps) {
+  const params = (await searchParams) ?? {}
 
   const page = parseNumberParam(params.page, 1)
   const pageSize = clampPageSize(

@@ -1,6 +1,6 @@
 import type { SupabaseClient } from "@supabase/supabase-js"
 
-import type { Database } from "@/db/database.types"
+import type { Database, Json } from "@/db/database.types"
 import type {
   CreateRunCommand,
   CreateRunResponseDto,
@@ -197,10 +197,10 @@ export async function createForUser(
       user_id: userId,
       model: command.model,
       status,
-      input: command.input,
-      output: result.output,
-      model_metadata: result.modelMetadata,
-      token_usage: result.tokenUsage,
+      input: command.input as Json,
+      output: result.output as Json,
+      model_metadata: result.modelMetadata as Json,
+      token_usage: result.tokenUsage as Json,
       latency_ms: latencyMs,
       error_message: result.errorMessage ?? null,
     })
@@ -291,10 +291,10 @@ function mapRunRowToDto(row: RunRow): RunDto {
     userId: row.user_id as UserId,
     model: row.model,
     status: row.status,
-    input: row.input,
-    output: row.output,
-    modelMetadata: row.model_metadata,
-    tokenUsage: row.token_usage,
+    input: row.input as RunDto["input"],
+    output: row.output as RunDto["output"],
+    modelMetadata: row.model_metadata as RunDto["modelMetadata"],
+    tokenUsage: row.token_usage as RunDto["tokenUsage"],
     latencyMs: row.latency_ms,
     errorMessage: row.error_message,
     createdAt: row.created_at,

@@ -123,11 +123,13 @@ export async function isAuthenticated(page: Page): Promise<boolean> {
 /**
  * Generate a unique email for test registration
  * Uses timestamp to ensure uniqueness
+ * Note: Using mailinator.com domain because hosted Supabase rejects
+ * example.com (RFC 2606 reserved domain)
  */
 export function generateTestEmail(): string {
   const timestamp = Date.now();
   const random = Math.random().toString(36).substring(2, 8);
-  return `test-user-${timestamp}-${random}@example.com`;
+  return `test-user-${timestamp}-${random}@mailinator.com`;
 }
 
 /**
