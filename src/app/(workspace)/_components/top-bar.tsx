@@ -90,7 +90,7 @@ export function TopBar() {
       <div className="flex items-center gap-4">
         <div className="flex items-center gap-2">
           <span className="hidden text-xs text-zinc-600 dark:text-zinc-300 sm:inline">
-            {user.email}
+            {user?.email}
           </span>
           <Button
             type="button"
