@@ -77,9 +77,25 @@ export async function POST(
     }
 
     if (!data.session || !data.user) {
-      // This can happen when email confirmation is required
-      // In that case, we return a success response but indicate the user needs to confirm
+      // This can happen when:
+      // 1. Email confirmation is required - user needs to confirm email before signing in
+      // 2. Email already exists - Supabase returns fake success to prevent email enumeration
+      //
+      // To detect case 2: if we have a user but no session, and the user's identities array
+      // is empty, it means this is a fake user object returned for an existing email.
       if (data.user && !data.session) {
+        // Check if this is a fake user (duplicate email detection)
+        // When email already exists, Supabase returns a user object with empty identities
+        const identities = data.user.identities ?? []
+        if (identities.length === 0) {
+          throw new ApiError({
+            status: 409,
+            code: "CONFLICT",
+            message: "A user with this email already exists.",
+          })
+        }
+
+        // Otherwise, email confirmation is genuinely required
         return NextResponse.json<SignupSuccessResponse>(
           {
             accessToken: "",
