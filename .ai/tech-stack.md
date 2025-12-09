@@ -12,8 +12,8 @@
 
 ### Unit Tests
 - **Test Runner**: Jest ^29.x
-- **React Testing**: React Testing Library ^14.x
+- **React Testing**: React Testing Library ^16.x
 
 ### E2E Tests
-- **Framework**: Playwright ^1.40
+- **Framework**: Playwright ^1.51
 - **Browsers**: Chrome, Firefox, WebKit
