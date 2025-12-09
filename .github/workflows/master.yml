@@ -81,15 +81,19 @@ jobs:
       - name: Build for Cloudflare Pages
         run: npm run build:cf
 
-      - name: Prepare assets for Pages deployment
+      - name: Prepare output for Pages deployment
         run: |
-          # Copy all worker dependencies to assets directory
-          cp -r .open-next/cloudflare .open-next/assets/
-          cp -r .open-next/middleware .open-next/assets/
-          cp -r .open-next/.build .open-next/assets/
-          cp -r .open-next/server-functions .open-next/assets/
+          # Create deployment directory with all files in correct structure
+          mkdir -p .open-next/deploy
+          # Copy static assets (includes _next/ folder)
+          cp -r .open-next/assets/* .open-next/deploy/
+          # Copy worker dependencies
+          cp -r .open-next/cloudflare .open-next/deploy/
+          cp -r .open-next/middleware .open-next/deploy/
+          cp -r .open-next/.build .open-next/deploy/
+          cp -r .open-next/server-functions .open-next/deploy/
           # Copy and rename worker.js to _worker.js (required by Pages)
-          cp .open-next/worker.js .open-next/assets/_worker.js
+          cp .open-next/worker.js .open-next/deploy/_worker.js
 
       - name: Deploy to Cloudflare Pages
         uses: cloudflare/wrangler-action@v3
