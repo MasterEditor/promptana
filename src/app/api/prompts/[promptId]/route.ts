@@ -108,7 +108,7 @@ export async function PATCH(
 export async function DELETE(
   request: NextRequest,
   context: { params: Promise<{ promptId: string }> },
-): Promise<NextResponse<PromptDetailErrorResponse>> {
+): Promise<NextResponse<PromptDetailErrorResponse | null>> {
   try {
     const { promptId: rawPromptId } = await context.params
     const promptId = validatePromptId(rawPromptId)
@@ -134,9 +134,7 @@ export async function DELETE(
 
     await promptsService.deleteForUser(client, userId, promptId, rawBody ?? undefined)
 
-    return NextResponse.json<PromptDetailErrorResponse | undefined>(undefined, {
-      status: 204,
-    })
+    return new NextResponse(null, { status: 204 })
   } catch (error) {
     return handleRouteError<never, PromptDetailErrorResponse>(
       error,

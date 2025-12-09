@@ -35,7 +35,7 @@ export function handleRouteError<TSuccess, TError extends ErrorResponseDto>(
 ): NextResponse<TSuccess | TError> {
   if (error instanceof ApiError) {
     const { status, body } = apiErrorToResponse(error)
-    return NextResponse.json<TError>(body, { status })
+    return NextResponse.json<TError>(body as TError, { status })
   }
 
   // eslint-disable-next-line no-console
