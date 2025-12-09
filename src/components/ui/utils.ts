@@ -1,4 +1,6 @@
-export function cn(...inputs: Array<any>) {
+type ClassValue = string | number | boolean | null | undefined | ClassValue[] | Record<string, boolean | null | undefined>;
+
+export function cn(...inputs: ClassValue[]) {
   const classes: string[] = []
 
   for (const input of inputs) {
