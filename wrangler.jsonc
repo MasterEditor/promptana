@@ -3,11 +3,8 @@
   "name": "promptana",
   "compatibility_date": "2025-01-01",
   "compatibility_flags": ["nodejs_compat"],
-  "pages": {
-    "build_output_dir": ".open-next/assets"
-  },
+  "pages_build_output_dir": ".open-next/assets",
   "observability": {
     "enabled": true
   }
 }
-
